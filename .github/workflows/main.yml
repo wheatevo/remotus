@@ -11,8 +11,25 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7.2
-    - name: Run the default task
+    - name: Run unit tests and code linting
       run: |
         gem install bundler -v 2.2.9
         bundle install
         bundle exec rake
+        bundle exec yard
+
+    - name: Deploy documentation
+      if: github.ref == 'refs/heads/main'
+      uses: crazy-max/ghaction-github-pages@v2.2.0
+      with:
+        target_branch: gh-pages
+        build_dir: doc
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Release Gem
+      if: contains(github.ref, 'refs/tags/v')
+      uses: dawidd6/action-publish-gem@v1.2.0
+      with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
+        api_key: ${{secrets.RUBYGEMS_API_KEY}}
