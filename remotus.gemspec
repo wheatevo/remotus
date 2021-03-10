@@ -6,19 +6,18 @@ Gem::Specification.new do |spec|
   spec.name          = "remotus"
   spec.version       = Remotus::VERSION
   spec.authors       = ["Matthew Newell"]
-  spec.email         = ["matthew.newell@cerner.com"]
+  spec.email         = ["matthewtnewell@gmail.com"]
 
-  spec.summary       = "TODO: Write a short summary, because RubyGems requires one."
-  spec.description   = "TODO: Write a longer description or delete this line."
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = "Ruby gem for connecting to remote systems seamlessly via WinRM or SSH."
+  spec.description   = "Ruby gem for connecting to remote systems seamlessly via WinRM or SSH."
+  spec.homepage      = "https://github.com/wheatevo/remotus"
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
 
-  spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
-
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
-  spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  spec.metadata["source_code_uri"] = "https://github.com/wheatevo/remotus"
+  spec.metadata["documentation_uri"] = "https://wheatevo.github.io/remotus/"
+  spec.metadata["changelog_uri"] = "https://github.com/wheatevo/remotus/blob/master/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
@@ -29,9 +28,18 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # Uncomment to register a new dependency of your gem
-  # spec.add_dependency "example-gem", "~> 1.0"
+  # Dependencies
+  spec.add_dependency "connection_pool", "~> 2.2"
+  spec.add_dependency "net-scp", "~> 3.0"
+  spec.add_dependency "net-ssh", "~> 6.1"
+  spec.add_dependency "winrm", "~> 2.3"
+  spec.add_dependency "winrm-fs", "~> 1.3"
 
-  # For more information and examples about making a new gem, checkout our
-  # guide at: https://bundler.io/guides/creating_gem.html
+  # Development dependencies
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rubocop", "~> 1.7"
+  spec.add_development_dependency "rubocop-rake", "~> 0.5"
+  spec.add_development_dependency "rubocop-rspec", "~> 2.2"
+  spec.add_development_dependency "yard", "~> 0.9"
 end

@@ -1,5 +1,6 @@
 AllCops:
   TargetRubyVersion: 2.4
+  NewCops: enable
 
 Style/StringLiterals:
   Enabled: true
@@ -10,4 +11,31 @@ Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
 Layout/LineLength:
-  Max: 120
+  Max: 150
+
+Metrics/ClassLength:
+  Max: 250
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*.rb
+    - remotus.gemspec
+    - lib/remotus/ssh_connection.rb
+
+Metrics/AbcSize:
+  Max: 25
+  Exclude:
+    - lib/remotus/ssh_connection.rb
+
+Metrics/MethodLength:
+  Max: 20
+  Exclude:
+    - lib/remotus/ssh_connection.rb
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - lib/remotus/ssh_connection.rb
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - lib/remotus/ssh_connection.rb

@@ -1,0 +1,447 @@
+# frozen_string_literal: true
+
+require "remotus"
+require "remotus/result"
+require "remotus/auth"
+require "net/scp"
+require "net/ssh"
+
+module Remotus
+  # Class representing an SSH connection to a host
+  class SshConnection
+    # Standard SSH remote port
+    REMOTE_PORT = 22
+
+    # Standard SSH keepalive interval
+    KEEPALIVE_INTERVAL = 300
+
+    # Number of default retries
+    DEFAULT_RETRIES = 2
+
+    # @return [Integer] Remote port
+    attr_reader :port
+
+    # @return [String] host hostname
+    attr_reader :host
+
+    #
+    # Creates an SshConnection
+    #
+    # @param [String] host hostname
+    # @param [Integer] port remote port
+    #
+    def initialize(host, port = REMOTE_PORT)
+      Remotus.logger.debug { "Creating SshConnection #{object_id} for #{host}" }
+      @host = host
+      @port = port
+    end
+
+    #
+    # Connection type
+    #
+    # @return [Symbol] returns :ssh
+    #
+    def type
+      :ssh
+    end
+
+    #
+    # Retrieves/creates the base SSH connection for the host
+    # If the base connection already exists, the existing connection will be retrieved
+    #
+    # The SSH connection will be the same whether it is retrieved via base_connection or connection.
+    #
+    # @return [Net::SSH::Connection::Session] base SSH remote connection
+    #
+    def base_connection
+      connection
+    end
+
+    #
+    # Retrieves/creates the SSH connection for the host
+    # If the connection already exists, the existing connection will be retrieved
+    #
+    # @return [Net::SSH::Connection::Session] remote connection
+    #
+    def connection
+      return @connection unless restart_connection?
+
+      Remotus.logger.debug { "Initializing SSH connection to #{Remotus::Auth.credential(self).user}@#{@host}:#{@port}" }
+
+      options = { non_interactive: true, keepalive: true, keepalive_interval: KEEPALIVE_INTERVAL }
+
+      password = Remotus::Auth.credential(self).password
+      private_key_path = Remotus::Auth.credential(self).private_key
+      private_key_data = Remotus::Auth.credential(self).private_key_data
+
+      options[:password] = password if password
+      options[:keys] = [private_key_path] if private_key_path
+      options[:key_data] = [private_key_data] if private_key_data
+
+      @connection = Net::SSH.start(
+        @host,
+        Remotus::Auth.credential(self).user,
+        **options
+      )
+    end
+
+    #
+    # Whether the remote host's SSH port is available
+    #
+    # @return [Boolean] true if available, false otherwise
+    #
+    def port_open?
+      Remotus.port_open?(@host, @port)
+    end
+
+    #
+    # Runs a command on the host
+    #
+    # @param [String] command command to run
+    # @param [Array] args command arguments
+    # @param [Hash] options command options
+    # @option options [Boolean] :sudo whether to run the command with sudo (defaults to false)
+    # @option options [Boolean] :pty  whether to allocate a terminal (defaults to false)
+    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 1)
+    # @option options [String] :input stdin input to provide to the command
+    # @option options [Array<Integer>] :accepted_exit_codes array of acceptable exit codes (defaults to [0])
+    #                                                       only used if :on_error or :on_success are set
+    # @option options [Proc] :on_complete callback invoked when the command is finished (whether successful or unsuccessful)
+    # @option options [Proc] :on_error callback invoked when the command is unsuccessful
+    # @option options [Proc] :on_output callback invoked when any data is received
+    # @option options [Proc] :on_stderr callback invoked when stderr data is received
+    # @option options [Proc] :on_stdout callback invoked when stdout data is received
+    # @option options [Proc] :on_success callback invoked when the command is successful
+    #
+    # @return [Remotus::Result] result describing the stdout, stderr, and exit status of the command
+    #
+    def run(command, *args, **options)
+      command = "#{command}#{args.empty? ? "" : " "}#{args.join(" ")}"
+      input = options[:input] || +""
+      stdout = +""
+      stderr = +""
+      output = +""
+      exit_code = nil
+      retries ||= options[:retries] || DEFAULT_RETRIES
+      accepted_exit_codes = options[:accepted_exit_codes] || [0]
+
+      ssh_command = command
+
+      # Refer to the command by object_id throughout the log to avoid logging sensitive data
+      Remotus.logger.debug { "Preparing to run command #{command.object_id} on #{@host}" }
+
+      # Handle sudo
+      if options[:sudo]
+        Remotus.logger.debug { "Sudo is enabled for command #{command.object_id}" }
+        ssh_command = "sudo -p '' -S sh -c '#{command.gsub("'", "'\"'\"'")}'"
+        input = "#{Remotus::Auth.credential(self).password}\n#{input}"
+
+        # If password was nil, raise an exception
+        raise Remotus::MissingSudoPassword, "#{host} credential does not have a password specified" if input.start_with?("\n")
+      end
+
+      # Allocate a terminal if specified
+      pty = options[:pty] || false
+      skip_first_output = pty && options[:sudo]
+
+      # Open an SSH channel to the host
+      channel_handle = connection.open_channel do |channel|
+        # Execute the command
+        if pty
+          Remotus.logger.debug { "Requesting pty for command #{command.object_id}" }
+          channel.request_pty do |ch, success|
+            raise Remotus::PtyError, "could not obtain pty" unless success
+
+            ch.exec(ssh_command)
+          end
+        else
+          Remotus.logger.debug { "Executing command #{command.object_id}" }
+          channel.exec(ssh_command)
+        end
+
+        # Provide input
+        unless input.empty?
+          Remotus.logger.debug { "Sending input for command #{command.object_id}" }
+          channel.send_data input
+          channel.eof!
+        end
+
+        # Process stdout
+        channel.on_data do |ch, data|
+          # Skip the first iteration if sudo and pty is enabled to avoid outputting the sudo password
+          if skip_first_output
+            skip_first_output = false
+            next
+          end
+          stdout << data
+          output << data
+          options[:on_stdout].call(ch, data) if options[:on_stdout].respond_to?(:call)
+          options[:on_output].call(ch, data) if options[:on_output].respond_to?(:call)
+        end
+
+        # Process stderr
+        channel.on_extended_data do |ch, _, data|
+          stderr << data
+          output << data
+          options[:on_stderr].call(ch, data) if options[:on_stderr].respond_to?(:call)
+          options[:on_output].call(ch, data) if options[:on_output].respond_to?(:call)
+        end
+
+        # Process exit status/code
+        channel.on_request("exit-status") do |_, data|
+          exit_code = data.read_long
+        end
+      end
+
+      # Block until the command has completed execution
+      channel_handle.wait
+
+      Remotus.logger.debug { "Generating result for command #{command.object_id}" }
+      result = Remotus::Result.new(command, stdout, stderr, output, exit_code)
+
+      # If we are using sudo and experience an authentication failure, raise an exception
+      if options[:sudo] && result.error? && !result.stderr.empty? && result.stderr.match?(/^sudo: \d+ incorrect password attempts?$/)
+        raise Remotus::AuthenticationError, "Could not authenticate to sudo as #{Remotus::Auth.credential(self).user}"
+      end
+
+      # Perform success, error, and completion callbacks
+      options[:on_success].call(result) if options[:on_success].respond_to?(:call) && result.success?(accepted_exit_codes)
+      options[:on_error].call(result) if options[:on_error].respond_to?(:call) && result.error?(accepted_exit_codes)
+      options[:on_complete].call(result) if options[:on_complete].respond_to?(:call)
+
+      result
+    rescue Remotus::AuthenticationError => e
+      # Re-raise exception if the retry count is exceeded
+      Remotus.logger.debug do
+        "Sudo authentication failed for command #{command.object_id}, retrying with #{retries} attempt#{retries.abs == 1 ? "" : "s"} remaining..."
+      end
+      retries -= 1
+      raise if retries.negative?
+
+      # Remove user password to force credential store update on next retry
+      Remotus.logger.debug { "Removing current credential for #{@host} to force credential retrieval." }
+      Remotus::Auth.cache.delete(@host)
+
+      retry
+    rescue Net::SSH::AuthenticationFailed => e
+      # Attempt to update the user password and retry
+      Remotus.logger.debug do
+        "SSH authentication failed for command #{command.object_id}, retrying with #{retries} attempt#{retries.abs == 1 ? "" : "s"} remaining..."
+      end
+      retries -= 1
+      raise Remotus::AuthenticationError, e.to_s if retries.negative?
+
+      # Remove user password to force credential store update on next retry
+      Remotus.logger.debug { "Removing current credential for #{@host} to force credential retrieval." }
+      Remotus::Auth.cache.delete(@host)
+
+      retry
+    rescue IOError => e
+      # Re-raise exception if it is not a closed stream error or if the retry count is exceeded
+      Remotus.logger.debug do
+        "IOError (#{e}) encountered for command #{command.object_id}, retrying with #{retries} attempt#{retries.abs == 1 ? "" : "s"} remaining..."
+      end
+      retries -= 1
+      raise if e.to_s != "closed stream" || retries.negative?
+
+      retry
+    end
+
+    #
+    # Uploads a script and runs it on the host
+    #
+    # @param [String] local_path local path of the script (source)
+    # @param [String] remote_path remote path for the script (destination)
+    # @param [Array] args script arguments
+    # @param [Hash] options command options
+    # @option options [Boolean] :sudo whether to run the script with sudo (defaults to false)
+    # @option options [Boolean] :pty  whether to allocate a terminal (defaults to false)
+    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 1)
+    # @option options [String] :input stdin input to provide to the command
+    # @option options [Array<Integer>] :accepted_exit_codes array of acceptable exit codes (defaults to [0])
+    #                                                       only used if :on_error or :on_success are set
+    # @option options [Proc] :on_complete callback invoked when the command is finished (whether successful or unsuccessful)
+    # @option options [Proc] :on_error callback invoked when the command is unsuccessful
+    # @option options [Proc] :on_output callback invoked when any data is received
+    # @option options [Proc] :on_stderr callback invoked when stderr data is received
+    # @option options [Proc] :on_stdout callback invoked when stdout data is received
+    # @option options [Proc] :on_success callback invoked when the command is successful
+    #
+    # @return [Remotus::Result] result describing the stdout, stderr, and exit status of the command
+    #
+    def run_script(local_path, remote_path, *args, **options)
+      upload(local_path, remote_path, **options)
+      Remotus.logger.debug { "Running script #{remote_path} on #{@host}" }
+      run("chmod +x #{remote_path}", **options)
+      run(remote_path, *args, **options)
+    end
+
+    #
+    # Uploads a file from the local host to the remote host
+    #
+    # @param [String] local_path local path to upload the file from (source)
+    # @param [String] remote_path remote path to upload the file to (destination)
+    # @param [Hash] options upload options
+    # @option options [Boolean] :sudo whether to run the upload with sudo (defaults to false)
+    # @option options [String] :owner file owner ("oracle")
+    # @option options [String] :group file group ("dba")
+    # @option options [String] :mode file mode ("0640")
+    #
+    # @return [String] remote path
+    #
+    def upload(local_path, remote_path, options = {})
+      Remotus.logger.debug { "Uploading file #{local_path} to #{@host}:#{remote_path}" }
+
+      if options[:sudo]
+        sudo_upload(local_path, remote_path, options)
+      else
+        permission_cmd = permission_cmds(remote_path, options[:owner], options[:group], options[:mode])
+        connection.scp.upload!(local_path, remote_path, options)
+        run(permission_cmd).error! unless permission_cmd.empty?
+      end
+
+      remote_path
+    end
+
+    #
+    # Downloads a file from the remote host to the local host
+    #
+    # @param [String] remote_path remote path to download the file from (source)
+    # @param [String] local_path local path to download the file to (destination)
+    #                            if local_path is nil, the file's content will be returned
+    # @param [Hash] options download options
+    # @option options [Boolean] :sudo whether to run the download with sudo (defaults to false)
+    #
+    # @return [String] local path or file content (if local_path is nil)
+    #
+    def download(remote_path, local_path = nil, options = {})
+      # Support short calling syntax (download("remote_path", option1: 123, option2: 234))
+      if local_path.is_a?(Hash)
+        options = local_path
+        local_path = nil
+      end
+
+      # Sudo prep
+      if options[:sudo]
+        # Must first copy the file to an accessible directory for the login user to download it
+        user_remote_path = sudo_remote_file_path(remote_path)
+        Remotus.logger.debug { "Sudo enabled, copying file from #{@host}:#{remote_path} to #{@host}:#{user_remote_path}" }
+        run("/bin/cp -f '#{remote_path}' '#{user_remote_path}' && chown #{Remotus::Auth.credential(self).user} '#{user_remote_path}'",
+            sudo: true).error!
+        remote_path = user_remote_path
+      end
+
+      Remotus.logger.debug { "Downloading file from #{@host}:#{remote_path}" }
+      result = connection.scp.download!(remote_path, local_path, options)
+
+      # Return the file content if that is desired
+      local_path.nil? ? result : local_path
+    ensure
+      # Sudo cleanup
+      if options[:sudo]
+        Remotus.logger.debug { "Sudo enabled, removing temporary file from #{@host}:#{user_remote_path}" }
+        run("/bin/rm -f '#{user_remote_path}'", sudo: true).error!
+      end
+    end
+
+    #
+    # Checks if a remote file or directory exists
+    #
+    # @param [String] remote_path remote path to the file or directory
+    # @param [Hash] options command options
+    # @option options [Boolean] :sudo whether to run the check with sudo (defaults to false)
+    # @option options [Boolean] :pty  whether to allocate a terminal (defaults to false)
+    #
+    # @return [Boolean] true if the file or directory exists, false otherwise
+    #
+    def file_exist?(remote_path, **options)
+      Remotus.logger.debug { "Checking if file #{remote_path} exists on #{@host}" }
+      run("test -f '#{remote_path}' || test -d '#{remote_path}'", **options).success?
+    end
+
+    private
+
+    #
+    # Whether to restart the current SSH connection
+    #
+    # @return [Boolean] whether to restart the current connection
+    #
+    def restart_connection?
+      return true unless @connection
+      return true if @connection.closed?
+      return true if @host != @connection.host
+      return true if Remotus::Auth.credential(self).user != @connection.options[:user]
+      return true if Remotus::Auth.credential(self).password != @connection.options[:password]
+      return true if Array(Remotus::Auth.credential(self).private_key) != Array(@connection.options[:keys])
+      return true if Array(Remotus::Auth.credential(self).private_key_data) != Array(@connection.options[:key_data])
+
+      false
+    end
+
+    #
+    # Generates a temporary remote file path for sudo uploads and downloads
+    #
+    # @param [String] path remote path
+    #
+    # @return [String] temporary remote file path
+    #
+    def sudo_remote_file_path(path)
+      # Generate a simple path consisting of the filename, current time, our object ID, and a random hex ID
+      temp_file = "#{File.basename(path)}_#{Time.now.to_i}_#{object_id}_#{SecureRandom.hex}"
+      temp_file = ".#{temp_file}" unless temp_file.start_with?(".")
+      Remotus.logger.debug { "Generated temp file path #{temp_file}" }
+      temp_file
+    end
+
+    #
+    # Uploads a file to a remote node using sudo
+    #
+    # @param [String] local_path local path to upload the file from (source)
+    # @param [String] remote_path remote path to upload the file to (destination)
+    # @param [Hash] options upload options
+    # @option options [String] :owner file owner ("oracle")
+    # @option options [String] :group file group ("dba")
+    # @option options [String] :mode file mode ("0640")
+    #
+    def sudo_upload(local_path, remote_path, options = {})
+      # Must first upload the file to an accessible directory for the login user
+      user_remote_path = sudo_remote_file_path(remote_path)
+      Remotus.logger.debug { "Sudo enabled, uploading file to #{user_remote_path}" }
+      permission_cmd = permission_cmds(user_remote_path, options[:owner], options[:group], options[:mode])
+      connection.scp.upload!(local_path, user_remote_path, options)
+
+      # Set permissions and move the file to the correct destination
+      move_cmd = "/bin/mv -f '#{user_remote_path}' '#{remote_path}'"
+      move_cmd = "#{permission_cmd} && #{move_cmd}" unless permission_cmd.empty?
+
+      begin
+        Remotus.logger.debug { "Sudo enabled, moving file from #{user_remote_path} to #{remote_path}" }
+        run(move_cmd, sudo: true).error!
+      rescue StandardError
+        # If we failed to set permissions, ensure the remote user path is cleaned up
+        Remotus.logger.debug { "Sudo enabled, cleaning up #{user_remote_path}" }
+        run("/bin/rm -f '#{user_remote_path}'", sudo: true)
+        raise
+      end
+    end
+
+    #
+    # Generates commands to run to set remote file permissions
+    #
+    # @param [String] path remote file path ("/the/remote/path.txt")
+    # @param [String] owner owner ("root")
+    # @param [String] group group ("root")
+    # @param [String] mode mode ("0755")
+    #
+    # @return [String] generated permission command string
+    #
+    def permission_cmds(path, owner, group, mode)
+      cmds = ""
+      cmds = "/bin/chown #{owner}:#{group} '#{path}'" if owner || group
+      cmds = "#{cmds} &&" if !cmds.empty? && mode
+      cmds = "#{cmds} /bin/chmod #{mode} '#{path}'" if mode
+      Remotus.logger.debug { "Generated permission commands #{cmds}" }
+      cmds
+    end
+  end
+end
