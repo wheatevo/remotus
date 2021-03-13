@@ -72,6 +72,38 @@ RSpec.describe Remotus::HostPool do
         expect(host_pool.size).to eq(5)
       end
     end
+
+    context "when metadata are set" do
+      let(:meta) do
+        {
+          data1: 123,
+          "Very odd string key" => 555,
+          "%&*(&!%another_inValid key    with strange things" => "test",
+          { k: :v } => "oof"
+        }
+      end
+
+      it "generates dynamic methods for each metadata entry" do
+        host_pool = described_class.new(host, proto: :ssh, **meta)
+        meta.each do |k, v|
+          expect(host_pool.send(k.to_s.to_method_name)).to eq(v)
+          expect { host_pool.send("#{k.to_s.to_method_name}=", "new_value") }.to_not raise_error
+          expect(host_pool.data1).to eq("new_value")
+        end
+      end
+    end
+
+    context "when metadata are set to a conflicting key" do
+      it "raises an exception" do
+        described_class.instance_methods.each do |k|
+          # Skip instance methods that will not conflict or input that will be interpreted as a keyword arg
+          next if k != k.to_s.to_method_name || %i[size timeout port proto].include?(k)
+
+          bad_meta = { k => "value" }
+          expect { described_class.new(host, port: 22, proto: :ssh, **bad_meta) }.to raise_error(Remotus::InvalidMetadataKey)
+        end
+      end
+    end
   end
 
   describe "#expiration_time" do
@@ -192,6 +224,24 @@ RSpec.describe Remotus::HostPool do
     it "Sets the host credential in the auth cache" do
       subject.credential = cred
       expect(subject.credential).to eq(cred)
+    end
+  end
+
+  describe "#[]" do
+    it "returns metadata by key" do
+      expect(subject["not a key"]).to eq(nil)
+
+      subject["valid key"] = 123
+      expect(subject["valid key"]).to eq(123)
+      expect(subject.valid_key).to eq(123)
+    end
+  end
+
+  describe "#[]=" do
+    it "sets metadata by key" do
+      subject["new key"] = 123
+      expect(subject["new key"]).to eq(123)
+      expect(subject.new_key).to eq(123)
     end
   end
 end

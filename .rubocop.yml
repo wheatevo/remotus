@@ -39,3 +39,6 @@ Metrics/CyclomaticComplexity:
 Metrics/PerceivedComplexity:
   Exclude:
     - lib/remotus/ssh_connection.rb
+
+Metrics/ParameterLists:
+  Max: 6
