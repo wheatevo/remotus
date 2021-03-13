@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "remotus/core_ext/string"
 require "remotus/version"
 require "remotus/logger"
 require "remotus/pool"
@@ -139,4 +140,7 @@ module Remotus
 
   # Failed to find credential password when executing sudo command
   class MissingSudoPassword < Error; end
+
+  # Raised when an invalid metadata key is provided to a Remotus HostPool
+  class InvalidMetadataKey < Error; end
 end

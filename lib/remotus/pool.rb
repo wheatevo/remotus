@@ -145,6 +145,9 @@ module Remotus
 
         options.each do |k, v|
           Remotus.logger.debug { "Checking if option #{k} => #{v} has changed" }
+
+          next unless pool[host].respond_to?(k.to_sym)
+
           host_value = pool[host].send(k.to_sym)
 
           if v != host_value

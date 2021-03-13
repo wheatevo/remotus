@@ -4,6 +4,7 @@ require "remotus"
 require "remotus/auth"
 require "remotus/ssh_connection"
 require "remotus/winrm_connection"
+require "remotus/core_ext/string"
 require "connection_pool"
 
 module Remotus
@@ -38,9 +39,15 @@ module Remotus
     # @param [Integer] timeout amount of time to wait for a connection from the pool (optional)
     # @param [Integer] port port to use for the connection
     # @param [Symbol] proto protocol to use for the connection (:winrm, :ssh), must be specified if port is specified
+    # @param [Hash] metadata metadata for this connection. Useful for providing additional information to various authentication stores
+    #                        should be specified using snake_case symbol keys. If keys are not snake_case, they will be converted.
     #
-    def initialize(host, size: DEFAULT_POOL_SIZE, timeout: DEFAULT_EXPIRATION_SECONDS, port: nil, proto: nil)
+    def initialize(host, size: DEFAULT_POOL_SIZE, timeout: DEFAULT_EXPIRATION_SECONDS, port: nil, proto: nil, **metadata)
       Remotus.logger.debug { "Creating host pool for #{host}" }
+
+      # Update metadata information and generate the necessary accessor methods
+      @metadata = metadata
+      update_metadata_methods
 
       @host = host
       @proto = proto || Remotus.host_type(host)
@@ -177,5 +184,49 @@ module Remotus
       credential = Remotus::Auth::Credential.from_hash(credential) unless credential.is_a?(Remotus::Auth::Credential)
       Remotus::Auth.cache[host] = credential
     end
+
+    #
+    # Gets HostPool metadata at key
+    #
+    # @param [Object] key metadata key
+    #
+    # @return [Object] metadata value
+    #
+    def [](key)
+      @metadata[key]
+    end
+
+    #
+    # Sets HostPool metadata value at key
+    #
+    # @param [Object] key metadata key
+    # @param [Object] value new metadata value
+    #
+    def []=(key, value)
+      @metadata[key] = value
+      update_metadata_methods
+    end
+
+    private
+
+    #
+    # Updates accessor methods for any defined metadata in @metadata
+    #
+    def update_metadata_methods
+      @metadata.each do |k, _v|
+        safe_key = k.to_s.to_method_name
+
+        # Do not allow metadata to be set that conflicts with base HostPool instance methods
+        if RESERVED_METHOD_NAMES.include?(safe_key)
+          raise Remotus::InvalidMetadataKey, "Cannot use reserved method name #{safe_key} for a metadata key"
+        end
+
+        define_singleton_method(safe_key) { @metadata[k] } unless respond_to?(safe_key)
+        define_singleton_method("#{safe_key}=".to_sym) { |new_value| @metadata[k] = new_value } unless respond_to?("#{safe_key}=".to_sym)
+      end
+    end
+
+    # Array of all reserved method names, must set after all methods are defined
+    RESERVED_METHOD_NAMES = Remotus::HostPool.instance_methods.freeze
   end
 end

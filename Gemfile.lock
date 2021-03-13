@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    remotus (0.1.0)
+    remotus (0.2.0)
       connection_pool (~> 2.2)
       net-scp (~> 3.0)
       net-ssh (~> 6.1)
@@ -88,6 +88,7 @@ GEM
     yard (0.9.26)
 
 PLATFORMS
+  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -100,4 +101,4 @@ DEPENDENCIES
   yard (~> 0.9)
 
 BUNDLED WITH
-   2.2.9
+   2.2.14
