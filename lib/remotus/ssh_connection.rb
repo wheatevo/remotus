@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "forwardable"
 require "remotus"
 require "remotus/result"
 require "remotus/auth"
@@ -9,6 +10,8 @@ require "net/ssh"
 module Remotus
   # Class representing an SSH connection to a host
   class SshConnection
+    extend Forwardable
+
     # Standard SSH remote port
     REMOTE_PORT = 22
 
@@ -24,16 +27,24 @@ module Remotus
     # @return [String] host hostname
     attr_reader :host
 
+    # @return [Remotus::HostPool] host_pool associated host pool
+    attr_reader :host_pool
+
+    # Delegate metadata methods to associated host pool
+    def_delegators :@host_pool, :[], :[]=
+
     #
     # Creates an SshConnection
     #
     # @param [String] host hostname
     # @param [Integer] port remote port
+    # @param [Remotus::HostPool] host_pool associated host pool
     #
-    def initialize(host, port = REMOTE_PORT)
+    def initialize(host, port = REMOTE_PORT, host_pool: nil)
       Remotus.logger.debug { "Creating SshConnection #{object_id} for #{host}" }
       @host = host
       @port = port
+      @host_pool = host_pool
     end
 
     #

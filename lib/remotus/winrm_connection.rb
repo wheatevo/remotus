@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "forwardable"
 require "remotus"
 require "remotus/result"
 require "remotus/auth"
@@ -9,6 +10,8 @@ require "winrm-fs"
 module Remotus
   # Class representing a WinRM connection to a host
   class WinrmConnection
+    extend Forwardable
+
     # Standard WinRM remote port
     REMOTE_PORT = 5985
 
@@ -18,15 +21,23 @@ module Remotus
     # @return [String] host hostname
     attr_reader :host
 
+    # @return [Remotus::HostPool] host_pool associated host pool
+    attr_reader :host_pool
+
+    # Delegate metadata methods to associated host pool
+    def_delegators :@host_pool, :[], :[]=
+
     #
     # Creates a WinrmConnection
     #
     # @param [String] host hostname
     # @param [Integer] port remote port
+    # @param [Remotus::HostPool] host_pool associated host pool
     #
-    def initialize(host, port = REMOTE_PORT)
+    def initialize(host, port = REMOTE_PORT, host_pool: nil)
       @host = host
       @port = port
+      @host_pool = host_pool
     end
 
     #

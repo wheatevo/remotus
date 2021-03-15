@@ -12,7 +12,22 @@ RSpec.describe Remotus::Pool do
     it "gets the SSH host pool for the provided host and caches it" do
       host_pool = described_class.connect(host, proto: :ssh)
       expect(host_pool).to be_a(Remotus::HostPool)
-      expect(host_pool.object_id).to eq(described_class.connect(host, proto: :ssh).object_id)
+      expect(host_pool).to be(described_class.connect(host, proto: :ssh))
+    end
+
+    context "when provided different parameters" do
+      it "creates a new host pool" do
+        host_pool = described_class.connect(host, proto: :ssh)
+        expect(host_pool).to be_a(Remotus::HostPool)
+        expect(host_pool).to_not be(described_class.connect(host, proto: :winrm))
+        host_pool = described_class.connect(host, proto: :winrm)
+        expect(host_pool).to be(described_class.connect(host, proto: :winrm))
+
+        expect(host_pool).to_not be(described_class.connect(host, proto: :winrm, location: "Madrid", company: "Test Co"))
+        host_pool = described_class.connect(host)
+        expect(host_pool).to be(described_class.connect(host, proto: :winrm, location: "Madrid", company: "Test Co"))
+        expect(host_pool).to_not be(described_class.connect(host, proto: :winrm, location: "Madrid", company: "Test Comp"))
+      end
     end
   end
 
