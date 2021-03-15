@@ -15,7 +15,7 @@ module Remotus
       #
       # Retrieves a credential from the hash store
       #
-      # @param [Remotus::SshConnection, Remotus::WinrmConnection, #host] connection <description>
+      # @param [Remotus::SshConnection, Remotus::WinrmConnection, #host] connection associated connection
       # @param [Hash] _options unused options hash
       #
       # @return [Remotus::Auth::Credential, nil] found credential or nil
