@@ -2,6 +2,7 @@
 
 require "remotus"
 require "remotus/host_pool"
+require "remotus/core_ext/string"
 
 module Remotus
   # Class representing a connection pool containing many host-specific pools
@@ -144,9 +145,12 @@ module Remotus
         return false unless pool[host]
 
         options.each do |k, v|
+          k = k.to_s.to_method_name
+
           Remotus.logger.debug { "Checking if option #{k} => #{v} has changed" }
 
-          next unless pool[host].respond_to?(k.to_sym)
+          # If any of the options passed are new, assume a change has occurred
+          return true unless pool[host].respond_to?(k.to_sym)
 
           host_value = pool[host].send(k.to_sym)
 

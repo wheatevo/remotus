@@ -57,7 +57,7 @@ module Remotus
       connection_class = Object.const_get("Remotus::#{@proto.capitalize}Connection")
       port ||= connection_class::REMOTE_PORT
 
-      @pool = ConnectionPool.new(size: size, timeout: timeout) { connection_class.new(host, port) }
+      @pool = ConnectionPool.new(size: size, timeout: timeout) { connection_class.new(host, port, host_pool: self) }
       @size = size.to_i
       @timeout = timeout.to_i
       @expiration_time = Time.now + timeout
