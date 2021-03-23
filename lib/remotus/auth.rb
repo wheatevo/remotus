@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "remotus"
 require "remotus/auth/credential"
 require "remotus/auth/store"
 require "remotus/auth/hash_store"
@@ -17,15 +18,12 @@ module Remotus
     # @return [Remotus::Auth::Credential] found credential
     #
     def self.credential(connection, **options)
-      return cache[connection.host] if cache.key?(connection.host)
+      # Only return cached credentials that have a populated user and password, otherwise attempt retrieval
+      return cache[connection.host] if cache.key?(connection.host) && cache[connection.host].user && cache[connection.host].password
 
-      stores.each do |store|
-        host_cred = store.credential(connection, **options)
-        if host_cred
-          cache[connection.host] = host_cred
-          return host_cred
-        end
-      end
+      found_credential = credential_from_stores(connection, **options)
+      return found_credential if found_credential
+
       raise Remotus::MissingCredential, "Could not find credential for #{connection.host} in any credential store (#{stores.join(", ")})."
     end
 
@@ -61,6 +59,32 @@ module Remotus
     #
     def self.stores=(stores)
       @stores = stores
+    end
+
+    class << self
+      private
+
+      #
+      # Gets authentication credentials for the given connection and options from one of the credential stores
+      #
+      # @param [Remotus::SshConnection, Remotus::WinrmConnection, #host] connection remote connection
+      # @param [Hash] options options hash
+      #                       options may be used by different credential stores.
+      #
+      # @return [Remotus::Auth::Credential, nil] found credential or nil if the credential cannot be found
+      #
+      def credential_from_stores(connection, **options)
+        stores.each do |store|
+          Remotus.logger.debug { "Gathering #{connection.host} credentials from #{store} credential store" }
+          host_cred = store.credential(connection, **options)
+          next unless host_cred
+
+          Remotus.logger.debug { "#{connection.host} credentials found in #{store} credential store" }
+          cache[connection.host] = host_cred
+          return host_cred
+        end
+        nil
+      end
     end
   end
 end

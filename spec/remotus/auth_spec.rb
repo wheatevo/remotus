@@ -12,6 +12,33 @@ RSpec.describe Remotus::Auth do
   end
 
   describe "#credential" do
+    context "when the cache contains a host credential without a username or password" do
+      it "retrieves and caches a new credential" do
+        described_class.cache[host] = described_class::Credential.new(nil, nil)
+        described_class.stores = [hash_store]
+        hash_store.add(connection, cred)
+        expect(described_class.credential(connection)).to eq(cred)
+      end
+    end
+
+    context "when the cache contains a host credential without a username" do
+      it "retrieves and caches a new credential" do
+        described_class.cache[host] = described_class::Credential.new(nil, "password")
+        described_class.stores = [hash_store]
+        hash_store.add(connection, cred)
+        expect(described_class.credential(connection)).to eq(cred)
+      end
+    end
+
+    context "when the cache contains a host credential without a password" do
+      it "retrieves and caches a new credential" do
+        described_class.cache[host] = described_class::Credential.new("diff_user", nil)
+        described_class.stores = [hash_store]
+        hash_store.add(connection, cred)
+        expect(described_class.credential(connection)).to eq(cred)
+      end
+    end
+
     context "when the cache contains the host credential" do
       it "returns the credential" do
         described_class.cache[host] = cred
