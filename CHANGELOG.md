@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.2.3] - 2021-05-01
+* Resolve rexml vulnerability CVE-2021-28965
+
 ## [0.2.2] - 2021-03-23
 * Ensure both user and password are populated before using a cached credential
 
