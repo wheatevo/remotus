@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.3.0] - 2022-02-18
+* Add retries to SSH SCP transactions
+
 ## [0.2.3] - 2021-05-01
 * Resolve rexml vulnerability CVE-2021-28965
 

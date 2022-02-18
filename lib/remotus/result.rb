@@ -66,7 +66,7 @@ module Remotus
       return unless error?(accepted_exit_codes)
 
       raise Remotus::ResultError, "Error encountered executing #{@command}! Exit code #{@exit_code} was returned "\
-        "while a value in #{accepted_exit_codes} was expected.\n#{output}"
+                                  "while a value in #{accepted_exit_codes} was expected.\n#{output}"
     end
 
     #

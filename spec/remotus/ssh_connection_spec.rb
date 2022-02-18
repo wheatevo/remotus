@@ -135,7 +135,7 @@ RSpec.describe Remotus::SshConnection do
           Remotus::Result.new("", "", "", "", 0)
         )
 
-        expect(ssh_connection.scp).to receive(:download!).with(/\.remote\.txt\w+/, "local.txt", sudo: true)
+        expect(ssh_connection.scp).to receive(:download!).with(/\.remote\.txt\w+/, "local.txt", { sudo: true })
         expect(subject).to receive(:connection).and_return(ssh_connection)
         subject.download("/root/remote.txt", "local.txt", sudo: true)
       end

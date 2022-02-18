@@ -87,7 +87,7 @@ require "remotus"
 
 class SimpleStore < Remotus::Auth::Store
   def credential(connection, **options)
-    "#{connection.host}_password"
+    Remotus::Auth::Credential.new('user', "#{connection.host}_password")
   end
 end
 

@@ -42,3 +42,6 @@ Metrics/PerceivedComplexity:
 
 Metrics/ParameterLists:
   Max: 6
+
+Gemspec/RequireMFA:
+  Enabled: false
