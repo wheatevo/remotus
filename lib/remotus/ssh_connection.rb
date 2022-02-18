@@ -113,7 +113,7 @@ module Remotus
     # @param [Hash] options command options
     # @option options [Boolean] :sudo whether to run the command with sudo (defaults to false)
     # @option options [Boolean] :pty  whether to allocate a terminal (defaults to false)
-    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 1)
+    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 2)
     # @option options [String] :input stdin input to provide to the command
     # @option options [Array<Integer>] :accepted_exit_codes array of acceptable exit codes (defaults to [0])
     #                                                       only used if :on_error or :on_success are set
@@ -141,121 +141,88 @@ module Remotus
       # Refer to the command by object_id throughout the log to avoid logging sensitive data
       Remotus.logger.debug { "Preparing to run command #{command.object_id} on #{@host}" }
 
-      # Handle sudo
-      if options[:sudo]
-        Remotus.logger.debug { "Sudo is enabled for command #{command.object_id}" }
-        ssh_command = "sudo -p '' -S sh -c '#{command.gsub("'", "'\"'\"'")}'"
-        input = "#{Remotus::Auth.credential(self).password}\n#{input}"
+      with_retries(command, retries) do
+        # Handle sudo
+        if options[:sudo]
+          Remotus.logger.debug { "Sudo is enabled for command #{command.object_id}" }
+          ssh_command = "sudo -p '' -S sh -c '#{command.gsub("'", "'\"'\"'")}'"
+          input = "#{Remotus::Auth.credential(self).password}\n#{input}"
 
-        # If password was nil, raise an exception
-        raise Remotus::MissingSudoPassword, "#{host} credential does not have a password specified" if input.start_with?("\n")
-      end
+          # If password was nil, raise an exception
+          raise Remotus::MissingSudoPassword, "#{host} credential does not have a password specified" if input.start_with?("\n")
+        end
 
-      # Allocate a terminal if specified
-      pty = options[:pty] || false
-      skip_first_output = pty && options[:sudo]
+        # Allocate a terminal if specified
+        pty = options[:pty] || false
+        skip_first_output = pty && options[:sudo]
 
-      # Open an SSH channel to the host
-      channel_handle = connection.open_channel do |channel|
-        # Execute the command
-        if pty
-          Remotus.logger.debug { "Requesting pty for command #{command.object_id}" }
-          channel.request_pty do |ch, success|
-            raise Remotus::PtyError, "could not obtain pty" unless success
+        # Open an SSH channel to the host
+        channel_handle = connection.open_channel do |channel|
+          # Execute the command
+          if pty
+            Remotus.logger.debug { "Requesting pty for command #{command.object_id}" }
+            channel.request_pty do |ch, success|
+              raise Remotus::PtyError, "could not obtain pty" unless success
 
-            ch.exec(ssh_command)
+              ch.exec(ssh_command)
+            end
+          else
+            Remotus.logger.debug { "Executing command #{command.object_id}" }
+            channel.exec(ssh_command)
           end
-        else
-          Remotus.logger.debug { "Executing command #{command.object_id}" }
-          channel.exec(ssh_command)
-        end
 
-        # Provide input
-        unless input.empty?
-          Remotus.logger.debug { "Sending input for command #{command.object_id}" }
-          channel.send_data input
-          channel.eof!
-        end
-
-        # Process stdout
-        channel.on_data do |ch, data|
-          # Skip the first iteration if sudo and pty is enabled to avoid outputting the sudo password
-          if skip_first_output
-            skip_first_output = false
-            next
+          # Provide input
+          unless input.empty?
+            Remotus.logger.debug { "Sending input for command #{command.object_id}" }
+            channel.send_data input
+            channel.eof!
           end
-          stdout << data
-          output << data
-          options[:on_stdout].call(ch, data) if options[:on_stdout].respond_to?(:call)
-          options[:on_output].call(ch, data) if options[:on_output].respond_to?(:call)
+
+          # Process stdout
+          channel.on_data do |ch, data|
+            # Skip the first iteration if sudo and pty is enabled to avoid outputting the sudo password
+            if skip_first_output
+              skip_first_output = false
+              next
+            end
+            stdout << data
+            output << data
+            options[:on_stdout].call(ch, data) if options[:on_stdout].respond_to?(:call)
+            options[:on_output].call(ch, data) if options[:on_output].respond_to?(:call)
+          end
+
+          # Process stderr
+          channel.on_extended_data do |ch, _, data|
+            stderr << data
+            output << data
+            options[:on_stderr].call(ch, data) if options[:on_stderr].respond_to?(:call)
+            options[:on_output].call(ch, data) if options[:on_output].respond_to?(:call)
+          end
+
+          # Process exit status/code
+          channel.on_request("exit-status") do |_, data|
+            exit_code = data.read_long
+          end
         end
 
-        # Process stderr
-        channel.on_extended_data do |ch, _, data|
-          stderr << data
-          output << data
-          options[:on_stderr].call(ch, data) if options[:on_stderr].respond_to?(:call)
-          options[:on_output].call(ch, data) if options[:on_output].respond_to?(:call)
+        # Block until the command has completed execution
+        channel_handle.wait
+
+        Remotus.logger.debug { "Generating result for command #{command.object_id}" }
+        result = Remotus::Result.new(command, stdout, stderr, output, exit_code)
+
+        # If we are using sudo and experience an authentication failure, raise an exception
+        if options[:sudo] && result.error? && !result.stderr.empty? && result.stderr.match?(/^sudo: \d+ incorrect password attempts?$/)
+          raise Remotus::AuthenticationError, "Could not authenticate to sudo as #{Remotus::Auth.credential(self).user}"
         end
 
-        # Process exit status/code
-        channel.on_request("exit-status") do |_, data|
-          exit_code = data.read_long
-        end
+        # Perform success, error, and completion callbacks
+        options[:on_success].call(result) if options[:on_success].respond_to?(:call) && result.success?(accepted_exit_codes)
+        options[:on_error].call(result) if options[:on_error].respond_to?(:call) && result.error?(accepted_exit_codes)
+        options[:on_complete].call(result) if options[:on_complete].respond_to?(:call)
+
+        result
       end
-
-      # Block until the command has completed execution
-      channel_handle.wait
-
-      Remotus.logger.debug { "Generating result for command #{command.object_id}" }
-      result = Remotus::Result.new(command, stdout, stderr, output, exit_code)
-
-      # If we are using sudo and experience an authentication failure, raise an exception
-      if options[:sudo] && result.error? && !result.stderr.empty? && result.stderr.match?(/^sudo: \d+ incorrect password attempts?$/)
-        raise Remotus::AuthenticationError, "Could not authenticate to sudo as #{Remotus::Auth.credential(self).user}"
-      end
-
-      # Perform success, error, and completion callbacks
-      options[:on_success].call(result) if options[:on_success].respond_to?(:call) && result.success?(accepted_exit_codes)
-      options[:on_error].call(result) if options[:on_error].respond_to?(:call) && result.error?(accepted_exit_codes)
-      options[:on_complete].call(result) if options[:on_complete].respond_to?(:call)
-
-      result
-    rescue Remotus::AuthenticationError => e
-      # Re-raise exception if the retry count is exceeded
-      Remotus.logger.debug do
-        "Sudo authentication failed for command #{command.object_id}, retrying with #{retries} attempt#{retries.abs == 1 ? "" : "s"} remaining..."
-      end
-      retries -= 1
-      raise if retries.negative?
-
-      # Remove user password to force credential store update on next retry
-      Remotus.logger.debug { "Removing current credential for #{@host} to force credential retrieval." }
-      Remotus::Auth.cache.delete(@host)
-
-      retry
-    rescue Net::SSH::AuthenticationFailed => e
-      # Attempt to update the user password and retry
-      Remotus.logger.debug do
-        "SSH authentication failed for command #{command.object_id}, retrying with #{retries} attempt#{retries.abs == 1 ? "" : "s"} remaining..."
-      end
-      retries -= 1
-      raise Remotus::AuthenticationError, e.to_s if retries.negative?
-
-      # Remove user password to force credential store update on next retry
-      Remotus.logger.debug { "Removing current credential for #{@host} to force credential retrieval." }
-      Remotus::Auth.cache.delete(@host)
-
-      retry
-    rescue IOError => e
-      # Re-raise exception if it is not a closed stream error or if the retry count is exceeded
-      Remotus.logger.debug do
-        "IOError (#{e}) encountered for command #{command.object_id}, retrying with #{retries} attempt#{retries.abs == 1 ? "" : "s"} remaining..."
-      end
-      retries -= 1
-      raise if e.to_s != "closed stream" || retries.negative?
-
-      retry
     end
 
     #
@@ -267,7 +234,7 @@ module Remotus
     # @param [Hash] options command options
     # @option options [Boolean] :sudo whether to run the script with sudo (defaults to false)
     # @option options [Boolean] :pty  whether to allocate a terminal (defaults to false)
-    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 1)
+    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 2)
     # @option options [String] :input stdin input to provide to the command
     # @option options [Array<Integer>] :accepted_exit_codes array of acceptable exit codes (defaults to [0])
     #                                                       only used if :on_error or :on_success are set
@@ -297,6 +264,7 @@ module Remotus
     # @option options [String] :owner file owner ("oracle")
     # @option options [String] :group file group ("dba")
     # @option options [String] :mode file mode ("0640")
+    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 2)
     #
     # @return [String] remote path
     #
@@ -307,7 +275,11 @@ module Remotus
         sudo_upload(local_path, remote_path, options)
       else
         permission_cmd = permission_cmds(remote_path, options[:owner], options[:group], options[:mode])
-        connection.scp.upload!(local_path, remote_path, options)
+
+        with_retries("Upload #{local_path} to #{remote_path}", options[:retries] || DEFAULT_RETRIES) do
+          connection.scp.upload!(local_path, remote_path, options)
+        end
+
         run(permission_cmd).error! unless permission_cmd.empty?
       end
 
@@ -322,6 +294,7 @@ module Remotus
     #                            if local_path is nil, the file's content will be returned
     # @param [Hash] options download options
     # @option options [Boolean] :sudo whether to run the download with sudo (defaults to false)
+    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 2)
     #
     # @return [String] local path or file content (if local_path is nil)
     #
@@ -343,7 +316,12 @@ module Remotus
       end
 
       Remotus.logger.debug { "Downloading file from #{@host}:#{remote_path}" }
-      result = connection.scp.download!(remote_path, local_path, options)
+
+      result = nil
+
+      with_retries("Download #{remote_path} to #{local_path}", options[:retries] || DEFAULT_RETRIES) do
+        result = connection.scp.download!(remote_path, local_path, options)
+      end
 
       # Return the file content if that is desired
       local_path.nil? ? result : local_path
@@ -371,6 +349,39 @@ module Remotus
     end
 
     private
+
+    #
+    # Wraps one or many SSH commands to provide exception handling and retry support
+    # to a given block
+    #
+    # @param [String] command command to be run or command description
+    # @param [Integer] retries number of retries
+    #
+    def with_retries(command, retries)
+      yield if block_given?
+    rescue Remotus::AuthenticationError, Net::SSH::AuthenticationFailed => e
+      # Re-raise exception if the retry count is exceeded
+      Remotus.logger.debug do
+        "Sudo authentication failed for command #{command.object_id}, retrying with #{retries} attempt#{retries.abs == 1 ? "" : "s"} remaining..."
+      end
+      retries -= 1
+      raise Remotus::AuthenticationError, e.to_s if retries.negative?
+
+      # Remove user password to force credential store update on next retry
+      Remotus.logger.debug { "Removing current credential for #{@host} to force credential retrieval." }
+      Remotus::Auth.cache.delete(@host)
+
+      retry
+    rescue IOError => e
+      # Re-raise exception if it is not a closed stream error or if the retry count is exceeded
+      Remotus.logger.debug do
+        "IOError (#{e}) encountered for command #{command.object_id}, retrying with #{retries} attempt#{retries.abs == 1 ? "" : "s"} remaining..."
+      end
+      retries -= 1
+      raise if e.to_s != "closed stream" || retries.negative?
+
+      retry
+    end
 
     #
     # Whether to restart the current SSH connection
@@ -413,13 +424,17 @@ module Remotus
     # @option options [String] :owner file owner ("oracle")
     # @option options [String] :group file group ("dba")
     # @option options [String] :mode file mode ("0640")
+    # @option options [Integer] :retries number of times to retry a closed connection (defaults to 2)
     #
     def sudo_upload(local_path, remote_path, options = {})
       # Must first upload the file to an accessible directory for the login user
       user_remote_path = sudo_remote_file_path(remote_path)
       Remotus.logger.debug { "Sudo enabled, uploading file to #{user_remote_path}" }
       permission_cmd = permission_cmds(user_remote_path, options[:owner], options[:group], options[:mode])
-      connection.scp.upload!(local_path, user_remote_path, options)
+
+      with_retries("Upload #{local_path} to #{user_remote_path}", options[:retries] || DEFAULT_RETRIES) do
+        connection.scp.upload!(local_path, user_remote_path, options)
+      end
 
       # Set permissions and move the file to the correct destination
       move_cmd = "/bin/mv -f '#{user_remote_path}' '#{remote_path}'"
