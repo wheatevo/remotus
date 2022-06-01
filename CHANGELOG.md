@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.4.0] - 2022-06-02
+* Added winrm-elevated gem to solve wirnrm AuthenticationError
+
 ## [0.3.0] - 2022-02-18
 * Add retries to SSH SCP transactions
 

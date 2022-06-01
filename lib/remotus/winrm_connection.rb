@@ -69,14 +69,16 @@ module Remotus
 
     #
     # Retrieves/creates the WinRM shell connection for the host
+    #
+    # @param [symbol] type command type
     # If the connection already exists, the existing connection will be retrieved
     #
-    # @return [WinRM::Shells::Powershell] remote connection
+    # @return [WinRM::Shells::type] remote connection
     #
-    def connection
+    def connection(type = :powershell)
       return @connection unless restart_connection?
 
-      @connection = base_connection(reload: true).shell(:powershell)
+      @connection = base_connection(reload: true).shell(type)
     end
 
     #
@@ -93,13 +95,14 @@ module Remotus
     #
     # @param [String] command command to run
     # @param [Array] args command arguments
-    # @param [Hash] _options unused command options
+    # @param [Hash] options command options
+    # @param [Hash] options type :symbol
     #
     # @return [Remotus::Result] result describing the stdout, stderr, and exit status of the command
     #
-    def run(command, *args, **_options)
+    def run(command, *args, **options)
       command = "#{command}#{args.empty? ? "" : " "}#{args.join(" ")}"
-      run_result = connection.run(command)
+      run_result = connection(options[:type]).run(command)
       Remotus::Result.new(command, run_result.stdout, run_result.stderr, run_result.output, run_result.exitcode)
     rescue WinRM::WinRMAuthorizationError => e
       raise Remotus::AuthenticationError, e.to_s
