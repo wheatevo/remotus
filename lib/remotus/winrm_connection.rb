@@ -5,6 +5,7 @@ require "remotus"
 require "remotus/result"
 require "remotus/auth"
 require "winrm"
+require "winrm-elevated"
 require "winrm-fs"
 
 module Remotus
@@ -102,7 +103,7 @@ module Remotus
     #
     def run(command, *args, **options)
       command = "#{command}#{args.empty? ? "" : " "}#{args.join(" ")}"
-      run_result = connection(options[:type]).run(command)
+      run_result = options[:type].nil? ? connection.run(command) : connection(options[:type]).run(command)
       Remotus::Result.new(command, run_result.stdout, run_result.stderr, run_result.output, run_result.exitcode)
     rescue WinRM::WinRMAuthorizationError => e
       raise Remotus::AuthenticationError, e.to_s
