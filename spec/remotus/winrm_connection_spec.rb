@@ -7,6 +7,10 @@ RSpec.describe Remotus::WinrmConnection do
     double(WinRM::Connection, shell: double(WinRM::Shells::Powershell))
   end
 
+  let(:winrm_elevated_connection) do
+    double(WinRM::Connection, shell: double(WinRM::Shells::Elevated))
+  end
+
   let(:winrm_file_manager) do
     double(WinRM::FS::FileManager)
   end
@@ -49,7 +53,7 @@ RSpec.describe Remotus::WinrmConnection do
   end
 
   describe "#base_connection" do
-    it "creates the base connection" do
+    it "creates the base connection with powershell privilage" do
       expect(WinRM::Connection).to receive(:new).with(
         endpoint: "http://#{host}:5985/wsman",
         transport: :negotiate,
@@ -58,16 +62,36 @@ RSpec.describe Remotus::WinrmConnection do
       ).and_return(winrm_connection)
       subject.base_connection
     end
+
+    it "creates the base connection with elevated privilage" do
+      expect(WinRM::Connection).to receive(:new).with(
+        endpoint: "http://#{host}:5985/wsman",
+        transport: :negotiate,
+        user: cred.user,
+        password: cred.password
+      ).and_return(winrm_elevated_connection)
+      subject.base_connection
+    end
   end
 
   describe "#connection" do
-    it "creates the connection shell" do
+    it "creates the connection shell with powershell privilage" do
       expect(WinRM::Connection).to receive(:new).with(
         endpoint: "http://#{host}:5985/wsman",
         transport: :negotiate,
         user: cred.user,
         password: cred.password
       ).and_return(winrm_connection)
+      subject.connection
+    end
+    
+    it "creates the connection shell with elevated privilage" do
+      expect(WinRM::Connection).to receive(:new).with(
+        endpoint: "http://#{host}:5985/wsman",
+        transport: :negotiate,
+        user: cred.user,
+        password: cred.password
+      ).and_return(winrm_elevated_connection)
       subject.connection
     end
   end
@@ -80,9 +104,16 @@ RSpec.describe Remotus::WinrmConnection do
   end
 
   describe "#run" do
-    it "runs the command over WinRM" do
+    it "runs the command over WinRM with powershell" do
       expect(subject).to receive(:base_connection).and_return(winrm_connection)
       expect(winrm_connection.shell).to receive(:run).with("dir").and_return(winrm_result)
+      result = subject.run("dir")
+      expect(result.command).to eq("dir")
+    end
+
+    it "runs the command over WinRM with elevated" do
+      expect(subject).to receive(:base_connection).and_return(winrm_elevated_connection)
+      expect(winrm_elevated_connection.shell).to receive(:run).with("dir").and_return(winrm_result)
       result = subject.run("dir")
       expect(result.command).to eq("dir")
     end
