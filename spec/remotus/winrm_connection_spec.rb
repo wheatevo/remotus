@@ -53,7 +53,7 @@ RSpec.describe Remotus::WinrmConnection do
   end
 
   describe "#base_connection" do
-    it "creates the base connection with powershell privilage" do
+    it "creates the base connection with powershell privilege" do
       expect(WinRM::Connection).to receive(:new).with(
         endpoint: "http://#{host}:5985/wsman",
         transport: :negotiate,
@@ -63,7 +63,7 @@ RSpec.describe Remotus::WinrmConnection do
       subject.base_connection
     end
 
-    it "creates the base connection with elevated privilage" do
+    it "creates the base connection with elevated privilege" do
       expect(WinRM::Connection).to receive(:new).with(
         endpoint: "http://#{host}:5985/wsman",
         transport: :negotiate,
@@ -75,7 +75,7 @@ RSpec.describe Remotus::WinrmConnection do
   end
 
   describe "#connection" do
-    it "creates the connection shell with powershell privilage" do
+    it "creates the connection shell with powershell privilege" do
       expect(WinRM::Connection).to receive(:new).with(
         endpoint: "http://#{host}:5985/wsman",
         transport: :negotiate,
@@ -84,8 +84,8 @@ RSpec.describe Remotus::WinrmConnection do
       ).and_return(winrm_connection)
       subject.connection
     end
-    
-    it "creates the connection shell with elevated privilage" do
+
+    it "creates the connection shell with elevated privilege" do
       expect(WinRM::Connection).to receive(:new).with(
         endpoint: "http://#{host}:5985/wsman",
         transport: :negotiate,

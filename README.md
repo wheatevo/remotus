@@ -54,6 +54,9 @@ result.exit_code
 # Run a command on the remote host with sudo (Linux only, requires password to be specified)
 result = connection.run("ls /root", sudo: true)
 
+# Run a command on the remote host with elevated shell privilege
+result = connection.run("ipconfg", options: {shell: :elevated})
+
 # Run a script on the remote host
 connection.run_script("/local/script.sh", "/remote/path/script.sh")
 
