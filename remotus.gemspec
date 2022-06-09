@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "net-scp", "~> 3.0"
   spec.add_dependency "net-ssh", "~> 6.1"
   spec.add_dependency "winrm", "~> 2.3"
-  spec.add_dependency "winrm-elevated", "~> 1.2.3"
+  spec.add_dependency "winrm-elevated", "~> 1.2"
   spec.add_dependency "winrm-fs", "~> 1.3"
 
   # Development dependencies

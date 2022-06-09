@@ -4,6 +4,7 @@ require "forwardable"
 require "remotus"
 require "remotus/result"
 require "remotus/auth"
+require "remotus/core_ext/elevated"
 require "winrm"
 require "winrm-elevated"
 require "winrm-fs"
@@ -22,6 +23,9 @@ module Remotus
     # @return [String] host hostname
     attr_reader :host
 
+    # @return [String] shell type
+    attr_reader :shell
+
     # @return [Remotus::HostPool] host_pool associated host pool
     attr_reader :host_pool
 
@@ -39,6 +43,7 @@ module Remotus
       @host = host
       @port = port
       @host_pool = host_pool
+      @shell = :powershell
     end
 
     #
@@ -77,9 +82,10 @@ module Remotus
     # @return [WinRM::Shells::Powershell, WinRM::Shells::Elevated] remote connection
     #
     def connection(shell = :powershell)
-      return @connection unless restart_connection?
+      return @connection unless restart_connection?(shell: shell)
 
-      @connection = base_connection(reload: true).shell(shell)
+      @shell = shell
+      @connection = base_connection(reload: true).shell(@shell)
     end
 
     #
@@ -175,7 +181,7 @@ module Remotus
     # @return [Boolean] whether to restart the current base connection
     #
     def restart_base_connection?
-      return restart_connection? if @connection
+      return restart_connection?(shell: @shell) if @connection
       return true unless @base_connection
       return true if @host != @base_connection.instance_values["connection_opts"][:endpoint].scan(%r{//(.*):}).flatten.first
       return true if Remotus::Auth.credential(self).user != @base_connection.instance_values["connection_opts"][:user]
@@ -189,8 +195,9 @@ module Remotus
     #
     # @return [Boolean] whether to restart the current connection
     #
-    def restart_connection?
+    def restart_connection?(**options)
       return true unless @connection
+      return true if shell && !options[:shell].casecmp?(@shell)
       return true if @host != @connection.connection_opts[:endpoint].scan(%r{//(.*):}).flatten.first
       return true if Remotus::Auth.credential(self).user != @connection.connection_opts[:user]
       return true if Remotus::Auth.credential(self).password != @connection.connection_opts[:password]
