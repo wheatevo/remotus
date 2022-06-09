@@ -103,7 +103,7 @@ module Remotus
     # @param [String] command command to run
     # @param [Array] args command arguments
     # @param [Hash] options command options
-    # @param options [Symbol] :shell shell type to use for the connection
+    # @option options [Symbol] :shell shell type to use for the connection
     #
     # @return [Remotus::Result] result describing the stdout, stderr, and exit status of the command
     #
@@ -192,6 +192,9 @@ module Remotus
 
     #
     # Whether to restart the current WinRM connection
+    #
+    # @param [Hash] options restart connection options
+    # @option options [Symbol] :shell shell type to use for the connection
     #
     # @return [Boolean] whether to restart the current connection
     #
