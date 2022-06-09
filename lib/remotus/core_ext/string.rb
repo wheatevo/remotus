@@ -24,4 +24,8 @@ module Remotus
   end
 end
 
-String.include(Remotus::CoreExt::String)
+# @api private
+# Core ruby string class
+class String
+  include Remotus::CoreExt::String
+end
