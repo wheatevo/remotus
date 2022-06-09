@@ -4,7 +4,9 @@ require "forwardable"
 require "remotus"
 require "remotus/result"
 require "remotus/auth"
+require "remotus/core_ext/elevated"
 require "winrm"
+require "winrm-elevated"
 require "winrm-fs"
 
 module Remotus
@@ -20,6 +22,9 @@ module Remotus
 
     # @return [String] host hostname
     attr_reader :host
+
+    # @return [String] shell type
+    attr_reader :shell
 
     # @return [Remotus::HostPool] host_pool associated host pool
     attr_reader :host_pool
@@ -38,6 +43,7 @@ module Remotus
       @host = host
       @port = port
       @host_pool = host_pool
+      @shell = :powershell
     end
 
     #
@@ -69,14 +75,17 @@ module Remotus
 
     #
     # Retrieves/creates the WinRM shell connection for the host
+    #
+    # @param [symbol] shell connection shell type, defaults to :powershell
     # If the connection already exists, the existing connection will be retrieved
     #
-    # @return [WinRM::Shells::Powershell] remote connection
+    # @return [WinRM::Shells::Powershell, WinRM::Shells::Elevated] remote connection
     #
-    def connection
-      return @connection unless restart_connection?
+    def connection(shell = :powershell)
+      return @connection unless restart_connection?(shell: shell)
 
-      @connection = base_connection(reload: true).shell(:powershell)
+      @shell = shell
+      @connection = base_connection(reload: true).shell(@shell)
     end
 
     #
@@ -93,13 +102,14 @@ module Remotus
     #
     # @param [String] command command to run
     # @param [Array] args command arguments
-    # @param [Hash] _options unused command options
+    # @param [Hash] options command options
+    # @param options [Symbol] :shell shell type to use for the connection
     #
     # @return [Remotus::Result] result describing the stdout, stderr, and exit status of the command
     #
-    def run(command, *args, **_options)
+    def run(command, *args, **options)
       command = "#{command}#{args.empty? ? "" : " "}#{args.join(" ")}"
-      run_result = connection.run(command)
+      run_result = options[:shell].nil? ? connection.run(command) : connection(options[:shell]).run(command)
       Remotus::Result.new(command, run_result.stdout, run_result.stderr, run_result.output, run_result.exitcode)
     rescue WinRM::WinRMAuthorizationError => e
       raise Remotus::AuthenticationError, e.to_s
@@ -171,7 +181,7 @@ module Remotus
     # @return [Boolean] whether to restart the current base connection
     #
     def restart_base_connection?
-      return restart_connection? if @connection
+      return restart_connection?(shell: @shell) if @connection
       return true unless @base_connection
       return true if @host != @base_connection.instance_values["connection_opts"][:endpoint].scan(%r{//(.*):}).flatten.first
       return true if Remotus::Auth.credential(self).user != @base_connection.instance_values["connection_opts"][:user]
@@ -185,8 +195,9 @@ module Remotus
     #
     # @return [Boolean] whether to restart the current connection
     #
-    def restart_connection?
+    def restart_connection?(**options)
       return true unless @connection
+      return true if shell && !options[:shell].casecmp?(@shell)
       return true if @host != @connection.connection_opts[:endpoint].scan(%r{//(.*):}).flatten.first
       return true if Remotus::Auth.credential(self).user != @connection.connection_opts[:user]
       return true if Remotus::Auth.credential(self).password != @connection.connection_opts[:password]
