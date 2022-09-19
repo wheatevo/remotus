@@ -2,7 +2,20 @@
 
 RSpec.describe Remotus::SshConnection do
   let(:host) { "test.local" }
-  let(:cred) { Remotus::Auth::Credential.new("user", "pass") }
+  let(:user) { "user" }
+  let(:password) { "pass" }
+  let(:port) { 22 }
+  let(:host_pool) { nil }
+
+  let(:gateway_host) { nil }
+  let(:gateway_port) { 22 }
+  let(:gateway_metadata) { {} }
+  let(:gateway_user) { "gateway" }
+  let(:gateway_password) { "gwpass" }
+
+  let(:cred) { Remotus::Auth::Credential.new(user, password) }
+  let(:gateway_cred) { Remotus::Auth::Credential.new(gateway_user, gateway_password) }
+
   let(:ssh_connection) do
     double(
       Net::SSH::Connection::Session,
@@ -10,10 +23,11 @@ RSpec.describe Remotus::SshConnection do
       scp: double(Net::SCP, upload!: nil)
     )
   end
-  subject { described_class.new(host) }
+  subject { described_class.new(host, port, host_pool: host_pool) }
 
   before do
     Remotus::Auth.cache[host] = cred
+    Remotus::Auth.cache[gateway_host] = gateway_cred if gateway_host
   end
 
   describe "#initialize" do
@@ -41,29 +55,78 @@ RSpec.describe Remotus::SshConnection do
     it "returns the port" do
       expect(subject.port).to eq(22)
     end
+
+    context "when a custom port is provided" do
+      let(:port) { 2222 }
+
+      it "returns the custom port" do
+        expect(subject.port).to eq(port)
+      end
+    end
   end
 
   describe "#base_connection" do
     it "creates the connection" do
       expect(Net::SSH).to receive(:start).with(
-        host, "user", password: "pass", non_interactive: true, keepalive: true, keepalive_interval: 300
+        host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
       )
       subject.base_connection
+    end
+
+    context "when gateway parameters are specified" do
+      let(:gateway_host) { "gateway.local" }
+      let(:gateway_port) { 2222 }
+      let(:gateway_double) { double(Net::SSH::Gateway) }
+
+      let(:host_pool) do
+        { gateway_host: gateway_host, gateway_port: gateway_port, gateway_metadata: { test: "value" } }
+      end
+
+      it "creates the gateway connection" do
+        expect(Net::SSH::Gateway).to receive(:new).with(
+          gateway_host, gateway_user, password: gateway_password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: gateway_port
+        ).and_return(gateway_double)
+        expect(gateway_double).to receive(:ssh).with(
+          host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
+        )
+
+        subject.base_connection
+      end
     end
   end
 
   describe "#connection" do
     it "creates the connection" do
       expect(Net::SSH).to receive(:start).with(
-        host, "user", password: "pass", non_interactive: true, keepalive: true, keepalive_interval: 300
+        host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
       )
       subject.connection
+    end
+
+    context "when gateway parameters are specified" do
+      let(:gateway_host) { "gateway.local" }
+      let(:gateway_port) { 2222 }
+      let(:gateway_double) { double(Net::SSH::Gateway) }
+
+      let(:host_pool) do
+        { gateway_host: gateway_host, gateway_port: gateway_port, gateway_metadata: { test: "value" } }
+      end
+
+      it "creates the gateway connection" do
+        expect(Net::SSH::Gateway).to receive(:new).with(
+          gateway_host, gateway_user, password: gateway_password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: gateway_port
+        ).and_return(gateway_double)
+        expect(gateway_double).to receive(:ssh).with(
+          host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
+        )
+        subject.connection
+      end
     end
   end
 
   describe "#port_open?" do
     it "calls Remotus.port_open?" do
-      expect(Remotus).to receive(:port_open?).with(host, 22).and_return(true)
+      expect(Remotus).to receive(:port_open?).with(host, port).and_return(true)
       expect(subject.port_open?).to eq(true)
     end
   end
@@ -88,10 +151,10 @@ RSpec.describe Remotus::SshConnection do
 
   describe "#run_script" do
     it "uploads the script, marks it executable, and runs it" do
-      expect(subject).to receive(:upload).with("local.sh", "/home/user/remote.sh")
-      expect(subject).to receive(:run).with("chmod +x /home/user/remote.sh")
-      expect(subject).to receive(:run).with("/home/user/remote.sh")
-      subject.run_script("local.sh", "/home/user/remote.sh")
+      expect(subject).to receive(:upload).with("local.sh", "/home/#{user}/remote.sh")
+      expect(subject).to receive(:run).with("chmod +x /home/#{user}/remote.sh")
+      expect(subject).to receive(:run).with("/home/#{user}/remote.sh")
+      subject.run_script("local.sh", "/home/#{user}/remote.sh")
     end
   end
 
@@ -124,7 +187,7 @@ RSpec.describe Remotus::SshConnection do
     context "when sudo is true" do
       it "Copies the file to an accessible directory with sudo, downloads it, and remove it" do
         expect(subject).to receive(:run).with(
-          %r{/bin/cp -f '/root/remote.txt' '\.remote\.txt.*' && chown user '\.remote\.txt.*'}, sudo: true
+          %r{/bin/cp -f '/root/remote.txt' '\.remote\.txt.*' && chown #{user} '\.remote\.txt.*'}, sudo: true
         ).and_return(
           Remotus::Result.new("", "", "", "", 0)
         )
@@ -167,6 +230,28 @@ RSpec.describe Remotus::SshConnection do
         )
         expect(subject.file_exist?("/tmp/no.txt")).to eq(false)
       end
+    end
+  end
+
+  describe Remotus::SshConnection::GatewayConnection do
+    let(:host) { "gateway.local" }
+    let(:port) { 22 }
+    let(:metadata) { { test: "data" } }
+    let(:internal_connection) { double(Net::SSH::Gateway) }
+
+    subject { described_class.new(host, port, metadata) }
+
+    it "Provides a basic class describing a gateway connection" do
+      expect(subject.host).to eq(host)
+      expect(subject.port).to eq(port)
+      expect(subject[:test]).to eq(metadata[:test])
+
+      expect(subject.connection).to eq(nil)
+      subject.connection = internal_connection
+      expect(subject.connection).to eq(internal_connection)
+
+      subject[:test] = "new value"
+      expect(subject[:test]).to eq("new value")
     end
   end
 end

@@ -6,21 +6,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7.2
+        ruby-version: 3.0.4
     - name: Run unit tests and code linting
       run: |
-        gem install bundler -v 2.2.9
+        gem install bundler -v 2.2.33
         bundle install
         bundle exec rake
+        bundle exec rspec docker
         bundle exec yard
 
     - name: Deploy documentation
       if: github.ref == 'refs/heads/main'
-      uses: crazy-max/ghaction-github-pages@v2.2.0
+      uses: crazy-max/ghaction-github-pages@v3.0.0
       with:
         target_branch: gh-pages
         build_dir: doc

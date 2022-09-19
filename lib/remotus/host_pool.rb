@@ -42,6 +42,13 @@ module Remotus
     # @param [Hash] metadata metadata for this connection. Useful for providing additional information to various authentication stores
     #                        should be specified using snake_case symbol keys. If keys are not snake_case, they will be converted.
     #
+    #                        To configure a connection gateway, the following metadata entries can be provided to the host pool:
+    #                          :gateway_host
+    #                          :gateway_port
+    #                          :gateway_metadata
+    #
+    #                        These function similarly to the host, port, and host_pool metadata fields.
+    #
     def initialize(host, size: DEFAULT_POOL_SIZE, timeout: DEFAULT_EXPIRATION_SECONDS, port: nil, proto: nil, **metadata)
       Remotus.logger.debug { "Creating host pool for #{host}" }
 

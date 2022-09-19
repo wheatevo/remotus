@@ -30,6 +30,15 @@ connection = Remotus.connect("remotehost.local", proto: :ssh, port: 2222)
 # Initialize a new connection pool to remotehost.local with a defined protocol and port and arbitrary metadata
 connection = Remotus.connect("remotehost.local", proto: :ssh, port: 2222, company: "Test Corp", location: "Oslo")
 
+# Initialize a new connection pool to remotehost.local via a gateway host named gateway.local
+connection = Remotus.connect("remotehost.local", gateway_host: "gateway.local")
+
+# Initialize a new connection pool to remotehost.local via a gateway host named gateway.local with a defined protocol and port
+connection = Remotus.connect("remotehost.local", proto: :ssh, port: 2222, gateway_host: "gateway.local", gateway_port: 2222)
+
+# Initialize a new connection pool to remotehost.local via a gateway host named gateway.local with arbitrary metadata
+connection = Remotus.connect("remotehost.local", company: "Test Corp", gateway_host: "gateway.local", gateway_metadata: { company: "Other Corp" })
+
 # Create a credential for the new connection pool
 connection.credential = Remotus::Auth::Credential.new("username", "password")
 
