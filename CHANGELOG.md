@@ -1,4 +1,6 @@
-## [Unreleased]
+## [0.5.0] - 2022-09-21
+* Ensure port argument is respected in `Remotus::SshConnection`
+* Add SSH gateway support
 
 ## [0.4.0] - 2022-06-02
 * Added winrm-elevated gem to solve wirnrm AuthenticationError

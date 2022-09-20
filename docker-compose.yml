@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  # Accessible gateway host
+  gateway:
+    build: docker
+    ports:
+      - "2222:22"
+  # Inaccessible gateway target host
+  target:
+    build: docker

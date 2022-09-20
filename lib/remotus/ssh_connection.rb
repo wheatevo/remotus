@@ -6,6 +6,7 @@ require "remotus/result"
 require "remotus/auth"
 require "net/scp"
 require "net/ssh"
+require "net/ssh/gateway"
 
 module Remotus
   # Class representing an SSH connection to a host
@@ -21,6 +22,9 @@ module Remotus
     # Number of default retries
     DEFAULT_RETRIES = 2
 
+    # Base options for new SSH connections
+    BASE_CONNECT_OPTIONS = { non_interactive: true, keepalive: true, keepalive_interval: KEEPALIVE_INTERVAL }.freeze
+
     # @return [Integer] Remote port
     attr_reader :port
 
@@ -33,12 +37,50 @@ module Remotus
     # Delegate metadata methods to associated host pool
     def_delegators :@host_pool, :[], :[]=
 
+    # Internal gateway connection class to allow for the host and metadata to be pulled for the gateway
+    # by authentication credentials
+    class GatewayConnection
+      extend Forwardable
+
+      # @return [String] host gateway hostname
+      attr_reader :host
+
+      # @return [Integer] Remote port
+      attr_reader :port
+
+      # @return [Net::SSH::Gateway] connection gateway connection
+      attr_accessor :connection
+
+      # Delegate metadata methods to associated hash
+      def_delegators :@metadata, :[], :[]=
+
+      #
+      # Creates a GatewayConnection
+      #
+      # @param [String] host hostname
+      # @param [Integer] port remote port
+      # @param [Hash] metadata associated metadata for this gateway
+      #
+      def initialize(host, port = REMOTE_PORT, metadata = {})
+        @host = host
+        @port = port
+        @metadata = metadata
+      end
+    end
+
     #
     # Creates an SshConnection
     #
     # @param [String] host hostname
     # @param [Integer] port remote port
     # @param [Remotus::HostPool] host_pool associated host pool
+    #                                      To configure the gateway, the following metadata
+    #                                      entries can be provided to the host pool:
+    #                                        :gateway_host
+    #                                        :gateway_port
+    #                                        :gateway_metadata
+    #
+    #                                      These function similarly to the host, port, and host_pool metadata fields.
     #
     def initialize(host, port = REMOTE_PORT, host_pool: nil)
       Remotus.logger.debug { "Creating SshConnection #{object_id} for #{host}" }
@@ -77,23 +119,32 @@ module Remotus
     def connection
       return @connection unless restart_connection?
 
-      Remotus.logger.debug { "Initializing SSH connection to #{Remotus::Auth.credential(self).user}@#{@host}:#{@port}" }
+      target_cred = Remotus::Auth.credential(self)
 
-      options = { non_interactive: true, keepalive: true, keepalive_interval: KEEPALIVE_INTERVAL }
+      Remotus.logger.debug { "Initializing SSH connection to #{target_cred.user}@#{@host}:#{@port}" }
 
-      password = Remotus::Auth.credential(self).password
-      private_key_path = Remotus::Auth.credential(self).private_key
-      private_key_data = Remotus::Auth.credential(self).private_key_data
+      target_options = BASE_CONNECT_OPTIONS.dup
+      target_options[:password] = target_cred.password if target_cred.password
+      target_options[:keys] = [target_cred.private_key] if target_cred.private_key
+      target_options[:key_data] = [target_cred.private_key_data] if target_cred.private_key_data
+      target_options[:port] = @port || REMOTE_PORT
 
-      options[:password] = password if password
-      options[:keys] = [private_key_path] if private_key_path
-      options[:key_data] = [private_key_data] if private_key_data
+      if via_gateway?
+        @gateway = GatewayConnection.new(@host_pool[:gateway_host], @host_pool[:gateway_port], @host_pool[:gateway_metadata])
+        gateway_cred = Remotus::Auth.credential(@gateway)
+        gateway_options = BASE_CONNECT_OPTIONS.dup
+        gateway_options[:port] = @gateway.port || REMOTE_PORT
+        gateway_options[:password] = gateway_cred.password if gateway_cred.password
+        gateway_options[:keys] = [gateway_cred.private_key] if gateway_cred.private_key
+        gateway_options[:key_data] = [gateway_cred.private_key_data] if gateway_cred.private_key_data
 
-      @connection = Net::SSH.start(
-        @host,
-        Remotus::Auth.credential(self).user,
-        **options
-      )
+        Remotus.logger.debug { "Initializing SSH gateway connection to #{gateway_cred.user}@#{@gateway.host}:#{gateway_options[:port]}" }
+
+        @gateway.connection = Net::SSH::Gateway.new(@gateway.host, gateway_cred.user, **gateway_options)
+        @gateway.connection.ssh(@host, target_cred.user, **target_options)
+      else
+        @connection = Net::SSH.start(@host, target_cred.user, **target_options)
+      end
     end
 
     #
@@ -392,10 +443,30 @@ module Remotus
       return true unless @connection
       return true if @connection.closed?
       return true if @host != @connection.host
-      return true if Remotus::Auth.credential(self).user != @connection.options[:user]
-      return true if Remotus::Auth.credential(self).password != @connection.options[:password]
-      return true if Array(Remotus::Auth.credential(self).private_key) != Array(@connection.options[:keys])
-      return true if Array(Remotus::Auth.credential(self).private_key_data) != Array(@connection.options[:key_data])
+
+      target_cred = Remotus::Auth.credential(self)
+
+      return true if target_cred.user != @connection.options[:user]
+      return true if target_cred.password != @connection.options[:password]
+      return true if Array(target_cred.private_key) != Array(@connection.options[:keys])
+      return true if Array(target_cred.private_key_data) != Array(@connection.options[:key_data])
+
+      # Perform gateway checks
+      if via_gateway?
+        return true unless @gateway&.connection&.active?
+
+        gateway_session = @gateway.connection.instance_variable_get(:@session)
+
+        return true if gateway_session.closed?
+        return true if @host_pool[:gateway_host] != gateway_session.host
+
+        gateway_cred = Remotus::Auth.credential(@gateway)
+
+        return true if gateway_cred.user != @connection.options[:user]
+        return true if gateway_cred.password != @connection.options[:password]
+        return true if Array(gateway_cred.private_key) != Array(@connection.options[:keys])
+        return true if Array(gateway_cred.private_key_data) != Array(@connection.options[:key_data])
+      end
 
       false
     end
@@ -468,6 +539,15 @@ module Remotus
       cmds = "#{cmds} /bin/chmod #{mode} '#{path}'" if mode
       Remotus.logger.debug { "Generated permission commands #{cmds}" }
       cmds
+    end
+
+    #
+    # Whether connecting via an SSH gateway
+    #
+    # @return [Boolean] true if using a gateway, false otherwise
+    #
+    def via_gateway?
+      host_pool && host_pool[:gateway_host]
     end
   end
 end

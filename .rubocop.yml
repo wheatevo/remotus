@@ -19,6 +19,7 @@ Metrics/ClassLength:
 Metrics/BlockLength:
   Exclude:
     - spec/**/*.rb
+    - docker/**/*.rb
     - remotus.gemspec
     - lib/remotus/ssh_connection.rb
 
