@@ -119,6 +119,9 @@ module Remotus
     def connection
       return @connection unless restart_connection?
 
+      # Close any active connections
+      close
+
       target_cred = Remotus::Auth.credential(self)
 
       Remotus.logger.debug { "Initializing SSH connection to #{target_cred.user}@#{@host}:#{@port}" }
@@ -141,10 +144,22 @@ module Remotus
         Remotus.logger.debug { "Initializing SSH gateway connection to #{gateway_cred.user}@#{@gateway.host}:#{gateway_options[:port]}" }
 
         @gateway.connection = Net::SSH::Gateway.new(@gateway.host, gateway_cred.user, **gateway_options)
-        @gateway.connection.ssh(@host, target_cred.user, **target_options)
+        @connection = @gateway.connection.ssh(@host, target_cred.user, **target_options)
       else
         @connection = Net::SSH.start(@host, target_cred.user, **target_options)
       end
+    end
+
+    #
+    # Closes the current SSH connection if it is active
+    #
+    def close
+      @connection&.close
+
+      @gateway&.connection&.shutdown! if via_gateway?
+
+      @gateway = nil
+      @connection = nil
     end
 
     #
@@ -462,10 +477,10 @@ module Remotus
 
         gateway_cred = Remotus::Auth.credential(@gateway)
 
-        return true if gateway_cred.user != @connection.options[:user]
-        return true if gateway_cred.password != @connection.options[:password]
-        return true if Array(gateway_cred.private_key) != Array(@connection.options[:keys])
-        return true if Array(gateway_cred.private_key_data) != Array(@connection.options[:key_data])
+        return true if gateway_cred.user != gateway_session.options[:user]
+        return true if gateway_cred.password != gateway_session.options[:password]
+        return true if Array(gateway_cred.private_key) != Array(gateway_session.options[:keys])
+        return true if Array(gateway_cred.private_key_data) != Array(gateway_session.options[:key_data])
       end
 
       false

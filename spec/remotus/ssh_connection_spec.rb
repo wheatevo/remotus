@@ -20,14 +20,47 @@ RSpec.describe Remotus::SshConnection do
     double(
       Net::SSH::Connection::Session,
       open_channel: double(Net::SSH::Connection::Channel, wait: nil),
-      scp: double(Net::SCP, upload!: nil)
+      scp: double(Net::SCP, upload!: nil),
+      closed?: false,
+      host: host,
+      options: {
+        user: user,
+        password: password
+      },
+      close: nil
     )
   end
+
+  let(:gateway_connection) do
+    double(
+      Net::SSH::Gateway,
+      active?: true,
+      shutdown!: nil
+    )
+  end
+
+  let(:gateway_session) do
+    double(
+      Net::SSH::Connection::Session,
+      open_channel: double(Net::SSH::Connection::Channel, wait: nil),
+      scp: double(Net::SCP, upload!: nil),
+      closed?: false,
+      host: gateway_host,
+      options: {
+        user: gateway_user,
+        password: gateway_password
+      },
+      close: nil
+    )
+  end
+
   subject { described_class.new(host, port, host_pool: host_pool) }
 
   before do
     Remotus::Auth.cache[host] = cred
     Remotus::Auth.cache[gateway_host] = gateway_cred if gateway_host
+
+    allow(gateway_connection).to receive(:instance_variable_get).with(:@session).and_return(gateway_session)
   end
 
   describe "#initialize" do
@@ -69,14 +102,15 @@ RSpec.describe Remotus::SshConnection do
     it "creates the connection" do
       expect(Net::SSH).to receive(:start).with(
         host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
-      )
-      subject.base_connection
+      ).and_return(ssh_connection)
+
+      connection = subject.base_connection
+      expect(connection).to be(subject.base_connection)
     end
 
     context "when gateway parameters are specified" do
       let(:gateway_host) { "gateway.local" }
       let(:gateway_port) { 2222 }
-      let(:gateway_double) { double(Net::SSH::Gateway) }
 
       let(:host_pool) do
         { gateway_host: gateway_host, gateway_port: gateway_port, gateway_metadata: { test: "value" } }
@@ -85,12 +119,13 @@ RSpec.describe Remotus::SshConnection do
       it "creates the gateway connection" do
         expect(Net::SSH::Gateway).to receive(:new).with(
           gateway_host, gateway_user, password: gateway_password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: gateway_port
-        ).and_return(gateway_double)
-        expect(gateway_double).to receive(:ssh).with(
+        ).and_return(gateway_connection)
+        expect(gateway_connection).to receive(:ssh).with(
           host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
-        )
+        ).and_return(ssh_connection)
 
-        subject.base_connection
+        new_connection = subject.base_connection
+        expect(new_connection).to be(subject.base_connection)
       end
     end
   end
@@ -99,14 +134,15 @@ RSpec.describe Remotus::SshConnection do
     it "creates the connection" do
       expect(Net::SSH).to receive(:start).with(
         host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
-      )
-      subject.connection
+      ).and_return(ssh_connection)
+
+      connection = subject.connection
+      expect(connection).to be(subject.connection)
     end
 
     context "when gateway parameters are specified" do
       let(:gateway_host) { "gateway.local" }
       let(:gateway_port) { 2222 }
-      let(:gateway_double) { double(Net::SSH::Gateway) }
 
       let(:host_pool) do
         { gateway_host: gateway_host, gateway_port: gateway_port, gateway_metadata: { test: "value" } }
@@ -115,12 +151,56 @@ RSpec.describe Remotus::SshConnection do
       it "creates the gateway connection" do
         expect(Net::SSH::Gateway).to receive(:new).with(
           gateway_host, gateway_user, password: gateway_password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: gateway_port
-        ).and_return(gateway_double)
-        expect(gateway_double).to receive(:ssh).with(
+        ).and_return(gateway_connection)
+        expect(gateway_connection).to receive(:ssh).with(
           host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
-        )
-        subject.connection
+        ).and_return(ssh_connection)
+
+        new_connection = subject.connection
+        expect(new_connection).to be(subject.connection)
       end
+    end
+  end
+
+  describe "#close" do
+    context "when using a gateway" do
+      let(:gateway_host) { "gateway.local" }
+      let(:gateway_port) { 2222 }
+
+      let(:host_pool) do
+        { gateway_host: gateway_host, gateway_port: gateway_port, gateway_metadata: { test: "value" } }
+      end
+
+      it "closes the active SSH and gateway connections" do
+        expect(Net::SSH::Gateway).to receive(:new).with(
+          gateway_host, gateway_user, password: gateway_password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: gateway_port
+        ).and_return(gateway_connection)
+        expect(gateway_connection).to receive(:ssh).with(
+          host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
+        ).and_return(ssh_connection)
+
+        expect(ssh_connection).to receive(:close)
+        expect(gateway_connection).to receive(:shutdown!)
+
+        subject.connection
+        subject.close
+
+        expect(subject.instance_variable_get(:@connection)).to eq(nil)
+        expect(subject.instance_variable_get(:@gateway)).to eq(nil)
+      end
+    end
+
+    it "closes the active SSH connection" do
+      expect(Net::SSH).to receive(:start).with(
+        host, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
+      ).and_return(ssh_connection)
+
+      expect(ssh_connection).to receive(:close)
+      subject.connection
+      subject.close
+
+      expect(subject.instance_variable_get(:@connection)).to eq(nil)
+      expect(subject.instance_variable_get(:@gateway)).to eq(nil)
     end
   end
 

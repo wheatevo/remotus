@@ -58,7 +58,11 @@ module Remotus
           return 0 unless @pool
 
           num_pools = count
-          @pool.reject! { |_hostname, _host_pool| true }
+
+          # Force connection close
+          @pool.each { |_hostname, host_pool| host_pool.close }
+          @pool = {}
+
           return num_pools
         end
       end
@@ -77,13 +81,18 @@ module Remotus
         # If the pool is not yet initialized, no processes can be reaped
         return 0 unless @pool
 
-        # reap all expired host pools
-        pre_reap_num_pools = count
-        @pool.reject! { |_hostname, host_pool| host_pool.expired? }
-        post_reap_num_pools = count
+        pools_reaped = 0
 
-        # Calculate the number of pools reaped
-        pools_reaped = pre_reap_num_pools - post_reap_num_pools
+        # Force connection close for expired host pools
+        @pool.each do |hostname, host_pool|
+          next unless host_pool.expired?
+
+          # Close and delete the host pool if it is expired
+          Remotus.logger.debug { "Reaping #{hostname} host pool" }
+          host_pool.close
+          @pool.delete(hostname)
+          pools_reaped += 1
+        end
 
         Remotus.logger.debug { "Reaped #{pools_reaped} expired host pools" }
 

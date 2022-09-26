@@ -106,6 +106,14 @@ RSpec.describe Remotus::HostPool do
     end
   end
 
+  describe "#close" do
+    it "closes the connection on each open connection" do
+      expect(subject.instance_variable_get(:@pool)).to receive(:reload)
+
+      expect { subject.close }.to_not raise_error
+    end
+  end
+
   describe "#expiration_time" do
     it "returns the expiration time" do
       expect(subject.expiration_time).to be_a(Time)

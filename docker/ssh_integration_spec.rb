@@ -16,6 +16,9 @@ RSpec.describe "Remotus::SshConnection Integration Tests" do
   end
 
   after(:all) do
+    # Close all active connections
+    Remotus.clear
+
     # docker-compose cleanup
     `docker-compose -f "docker-compose.yml" down -v`
   end

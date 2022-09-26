@@ -96,6 +96,17 @@ RSpec.describe Remotus::WinrmConnection do
     end
   end
 
+  describe "#close" do
+    it "closes the associated connection" do
+      subject.connection
+      expect(subject.instance_variable_get(:@connection)).to receive(:close)
+      subject.close
+
+      expect(subject.instance_variable_get(:@connection)).to eq(nil)
+      expect(subject.instance_variable_get(:@base_connection)).to eq(nil)
+    end
+  end
+
   describe "#port_open?" do
     it "calls Remotus.port_open?" do
       expect(Remotus).to receive(:port_open?).with(host, 5985).and_return(true)

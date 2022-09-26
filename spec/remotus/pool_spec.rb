@@ -74,7 +74,8 @@ RSpec.describe Remotus::Pool do
 
     context "when the pool contains host pools" do
       it "removes all host pools" do
-        described_class.connect(host, proto: :ssh)
+        ssh_connection = described_class.connect(host, proto: :ssh)
+        expect(ssh_connection).to receive(:close)
         expect(described_class.count).to eq(1)
         expect(described_class.clear).to eq(1)
         expect(described_class.count).to eq(0)
