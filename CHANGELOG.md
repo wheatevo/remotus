@@ -1,3 +1,8 @@
+## [0.6.0] - 2022-09-26
+* Add `#close` method to all connection types
+* Fix SSH gateway connection caching
+* Ensure SSH gateway connections are closed gracefully before reinitializing a connection
+
 ## [0.5.0] - 2022-09-21
 * Ensure port argument is respected in `Remotus::SshConnection`
 * Add SSH gateway support

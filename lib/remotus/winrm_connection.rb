@@ -64,6 +64,9 @@ module Remotus
     def base_connection(reload: false)
       return @base_connection if !reload && !restart_base_connection?
 
+      # Close any active connections
+      close
+
       Remotus.logger.debug { "Initializing WinRM connection to #{Remotus::Auth.credential(self).user}@#{@host}:#{@port}" }
       @base_connection = WinRM::Connection.new(
         endpoint: "http://#{@host}:#{@port}/wsman",
@@ -86,6 +89,15 @@ module Remotus
 
       @shell = shell
       @connection = base_connection(reload: true).shell(@shell)
+    end
+
+    #
+    # Closes the current WinRM connection if it is active
+    #
+    def close
+      @connection&.close
+      @connection = nil
+      @base_connection = nil
     end
 
     #

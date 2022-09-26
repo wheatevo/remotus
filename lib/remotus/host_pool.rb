@@ -88,6 +88,15 @@ module Remotus
     end
 
     #
+    # Closes all open connections in the pool.
+    # @see Remotus::SshConnection#close
+    # @see Remotus::WinrmConnection#close
+    #
+    def close
+      @pool.reload(&:close)
+    end
+
+    #
     # Provides an SSH or WinRM connection to a given block of code
     #
     # @example Run a command over SSH or WinRM using a pooled connection
