@@ -1,3 +1,7 @@
+## [1.0.0] - 2023-04-25
+* Update SSH dependencies to handle `pkeys are immutable on OpenSSL 3.0` errors on newer Ruby versions
+* Remove Ruby 2.5 support
+
 ## [0.6.0] - 2022-09-26
 * Add `#close` method to all connection types
 * Fix SSH gateway connection caching
