@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = "Ruby gem for connecting to remote systems seamlessly via WinRM or SSH."
   spec.homepage      = "https://github.com/wheatevo/remotus"
   spec.license       = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.6.0")
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/wheatevo/remotus"
@@ -29,9 +29,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Dependencies
-  spec.add_dependency "connection_pool", "~> 2.2"
-  spec.add_dependency "net-scp", "~> 3.0"
-  spec.add_dependency "net-ssh", "~> 6.1"
+  spec.add_dependency "connection_pool", "~> 2.4"
+  spec.add_dependency "net-scp", "~> 4.0"
+  spec.add_dependency "net-ssh", "~> 7.1"
   spec.add_dependency "net-ssh-gateway", "~> 2.0"
   spec.add_dependency "winrm", "~> 2.3"
   spec.add_dependency "winrm-elevated", "~> 1.2"

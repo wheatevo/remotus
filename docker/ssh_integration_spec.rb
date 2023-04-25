@@ -23,8 +23,8 @@ RSpec.describe "Remotus::SshConnection Integration Tests" do
     `docker-compose -f "docker-compose.yml" down -v`
   end
 
-  let(:test_script) { ::File.join(__dir__, "ssh_integration_script.sh") }
-  let(:test_script_dest) { ::File.join("/home/testuser", ::File.basename(test_script)) }
+  let(:test_script) { File.join(__dir__, "ssh_integration_script.sh") }
+  let(:test_script_dest) { File.join("/home/testuser", File.basename(test_script)) }
 
   context "when a gateway and inaccessible target host exist" do
     let(:gateway_hostname) { `docker ps | grep remotus_gateway`.split.first }

@@ -100,7 +100,7 @@ RSpec.describe Remotus do
   end
 
   describe "self#logger=" do
-    let(:logger) { ::Logger.new($stdout) }
+    let(:logger) { Logger.new($stdout) }
     it "replaces the current logger" do
       described_class.logger = logger
       expect(described_class.logger).to eq(logger)
@@ -114,7 +114,7 @@ RSpec.describe Remotus do
   end
 
   describe "self#log_formatter=" do
-    let(:formatter) { ::Logger::Formatter.new }
+    let(:formatter) { Logger::Formatter.new }
 
     it "replaces the cached log formatter" do
       original_formatter = described_class.log_formatter
