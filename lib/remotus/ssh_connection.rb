@@ -20,7 +20,7 @@ module Remotus
     KEEPALIVE_INTERVAL = 300
 
     # Number of default retries
-    DEFAULT_RETRIES = 2
+    DEFAULT_RETRIES = 8
 
     # Base options for new SSH connections
     BASE_CONNECT_OPTIONS = { non_interactive: true, keepalive: true, keepalive_interval: KEEPALIVE_INTERVAL }.freeze
@@ -424,6 +424,8 @@ module Remotus
     # @param [Integer] retries number of retries
     #
     def with_retries(command, retries)
+      sleep_time = 1
+
       yield if block_given?
     rescue Remotus::AuthenticationError, Net::SSH::AuthenticationFailed => e
       # Re-raise exception if the retry count is exceeded
@@ -446,6 +448,12 @@ module Remotus
       retries -= 1
       raise if e.to_s != "closed stream" || retries.negative?
 
+      # Close the existing connection before retrying again
+      close
+
+      Remotus.logger.debug { "Sleeping for #{sleep_time} seconds before next retry..." }
+      sleep sleep_time
+      sleep_time *= 2 # Double delay for each retry
       retry
     end
 

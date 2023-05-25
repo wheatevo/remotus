@@ -14,7 +14,7 @@ Layout/LineLength:
   Max: 150
 
 Metrics/ClassLength:
-  Max: 250
+  Max: 300
 
 Metrics/BlockLength:
   Exclude:
