@@ -154,9 +154,21 @@ module Remotus
     # Closes the current SSH connection if it is active
     #
     def close
-      @connection&.close
+      Remotus.logger.debug { "Closing SSH connection." }
 
-      @gateway&.connection&.shutdown! if via_gateway?
+      begin
+        @connection&.close
+      rescue StandardError => e
+        Remotus.logger.warn { "Failed to close existing SSH connection with error #{e}" }
+      end
+
+      begin
+        @gateway&.connection&.shutdown! if via_gateway?
+      rescue StandardError => e
+        Remotus.logger.warn { "Failed to close existing SSH gateway connection with error #{e}" }
+      end
+
+      Remotus.logger.debug { "Setting @gateway and @connection to nil." }
 
       @gateway = nil
       @connection = nil

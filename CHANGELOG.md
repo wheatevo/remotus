@@ -1,3 +1,6 @@
+## [1.1.1] - 2023-05-26
+* Handle close failures and improve logging around connection status.
+
 ## [1.1.0] - 2023-05-25
 * Improve exponential backoff during SSH retries.
 * Force connection close on IOError (closed stream).
