@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Remotus
+  
+    &mdash; Documentation by YARD 0.9.34
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "Remotus";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (R)</a> &raquo;
+    
+    
+    <span class="title">Remotus</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Remotus
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/remotus.rb<span class="defines">,<br />
+  lib/remotus/auth.rb,<br /> lib/remotus/pool.rb,<br /> lib/remotus/logger.rb,<br /> lib/remotus/result.rb,<br /> lib/remotus/version.rb,<br /> lib/remotus/host_pool.rb,<br /> lib/remotus/auth/store.rb,<br /> lib/remotus/ssh_connection.rb,<br /> lib/remotus/auth/credential.rb,<br /> lib/remotus/auth/hash_store.rb,<br /> lib/remotus/core_ext/string.rb,<br /> lib/remotus/winrm_connection.rb,<br /> lib/remotus/core_ext/elevated.rb</span>
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Contains classes and methods for creating remote connections and running commands</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Remotus/Auth.html" title="Remotus::Auth (module)">Auth</a></span>, <span class='object_link'><a href="Remotus/CoreExt.html" title="Remotus::CoreExt (module)">CoreExt</a></span>
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Remotus/AuthenticationError.html" title="Remotus::AuthenticationError (class)">AuthenticationError</a></span>, <span class='object_link'><a href="Remotus/Error.html" title="Remotus::Error (class)">Error</a></span>, <span class='object_link'><a href="Remotus/HostPool.html" title="Remotus::HostPool (class)">HostPool</a></span>, <span class='object_link'><a href="Remotus/HostTypeDeterminationError.html" title="Remotus::HostTypeDeterminationError (class)">HostTypeDeterminationError</a></span>, <span class='object_link'><a href="Remotus/InvalidMetadataKey.html" title="Remotus::InvalidMetadataKey (class)">InvalidMetadataKey</a></span>, <span class='object_link'><a href="Remotus/Logger.html" title="Remotus::Logger (class)">Logger</a></span>, <span class='object_link'><a href="Remotus/MissingCredential.html" title="Remotus::MissingCredential (class)">MissingCredential</a></span>, <span class='object_link'><a href="Remotus/MissingOverride.html" title="Remotus::MissingOverride (class)">MissingOverride</a></span>, <span class='object_link'><a href="Remotus/MissingSudoPassword.html" title="Remotus::MissingSudoPassword (class)">MissingSudoPassword</a></span>, <span class='object_link'><a href="Remotus/Pool.html" title="Remotus::Pool (class)">Pool</a></span>, <span class='object_link'><a href="Remotus/PtyError.html" title="Remotus::PtyError (class)">PtyError</a></span>, <span class='object_link'><a href="Remotus/Result.html" title="Remotus::Result (class)">Result</a></span>, <span class='object_link'><a href="Remotus/ResultError.html" title="Remotus::ResultError (class)">ResultError</a></span>, <span class='object_link'><a href="Remotus/SshConnection.html" title="Remotus::SshConnection (class)">SshConnection</a></span>, <span class='object_link'><a href="Remotus/WinrmConnection.html" title="Remotus::WinrmConnection (class)">WinrmConnection</a></span>
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="VERSION-constant" class="">VERSION =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Remotus gem version</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.2.0</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#clear-class_method" title="clear (class method)">.<strong>clear</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Removes all host pools from the pool in a thread-safe manner.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connect-class_method" title="connect (class method)">.<strong>connect</strong>(host, **options)  &#x21d2; Remotus::HostPool </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Creates/gets a host pool for the host that can be used to perform remote operations.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#count-class_method" title="count (class method)">.<strong>count</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Number of host pools in the connection pool.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#host_type-class_method" title="host_type (class method)">.<strong>host_type</strong>(host, timeout: 1)  &#x21d2; Symbol<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Determine remote host type by checking common ports.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#log_formatter-class_method" title="log_formatter (class method)">.<strong>log_formatter</strong>  &#x21d2; ::Logger::Formatter </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Gets the remotus log formatter.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#log_formatter=-class_method" title="log_formatter= (class method)">.<strong>log_formatter=</strong>(log_formatter)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Sets the remotus log formatter.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#logger-class_method" title="logger (class method)">.<strong>logger</strong>  &#x21d2; Remotus::Logger </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Gets the remotus logger.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#logger=-class_method" title="logger= (class method)">.<strong>logger=</strong>(logger)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Sets the remotus logger.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#port_open%3F-class_method" title="port_open? (class method)">.<strong>port_open?</strong>(host, port, timeout: 1)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Checks if a remote port is open.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="clear-class_method">
+  
+    .<strong>clear</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Removes all host pools from the pool in a thread-safe manner</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>number of host pools removed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+45
+46
+47</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 45</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+  <span class='const'><span class='object_link'><a href="" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Remotus/Pool.html" title="Remotus::Pool (class)">Pool</a></span></span><span class='period'>.</span><span class='id identifier rubyid_clear'><span class='object_link'><a href="Remotus/Pool.html#clear-class_method" title="Remotus::Pool.clear (method)">clear</a></span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connect-class_method">
+  
+    .<strong>connect</strong>(host, **options)  &#x21d2; <tt><span class='object_link'><a href="Remotus/HostPool.html" title="Remotus::HostPool (class)">Remotus::HostPool</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Creates/gets a host pool for the host that can be used to perform remote operations. After creation, the host pool will persist for future connections.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>host</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>hostname</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>options hash</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    
+    
+    <p class="tag_title">Options Hash (<tt>**options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:size</span>
+          <span class="type">(<tt>Integer</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>number of connections in the pool</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:timeout</span>
+          <span class="type">(<tt>Integer</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>amount of time to wait for a connection from the pool</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>Integer</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>port to use for the connection</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:proto</span>
+          <span class="type">(<tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>protocol to use for the connection (:winrm, :ssh), must be specified if port is specified</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>IP to use for the connection, preferred over the hostname if set. This should be used if the hostname is required for credential retrieval but the hostname cannot be resolved by DNS.</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Remotus/HostPool.html" title="Remotus::HostPool (class)">Remotus::HostPool</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Newly created or retrieved host pool</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_connect'>connect</span><span class='lparen'>(</span><span class='id identifier rubyid_host'>host</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Remotus/Pool.html" title="Remotus::Pool (class)">Pool</a></span></span><span class='period'>.</span><span class='id identifier rubyid_connect'><span class='object_link'><a href="Remotus/Pool.html#connect-class_method" title="Remotus::Pool.connect (method)">connect</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_host'>host</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="count-class_method">
+  
+    .<strong>count</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Number of host pools in the connection pool</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>number of host pools</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+36
+37
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 36</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
+  <span class='const'><span class='object_link'><a href="" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Remotus/Pool.html" title="Remotus::Pool (class)">Pool</a></span></span><span class='period'>.</span><span class='id identifier rubyid_count'><span class='object_link'><a href="Remotus/Pool.html#count-class_method" title="Remotus::Pool.count (method)">count</a></span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="host_type-class_method">
+  
+    .<strong>host_type</strong>(host, timeout: 1)  &#x21d2; <tt>Symbol</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Determine remote host type by checking common ports</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>host</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>hostname</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>timeout</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>1</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>amount of time to wait in seconds</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>:ssh, :winrm, or nil if it cannot be determined</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+74
+75
+76
+77
+78
+79
+80</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 74</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_host_type'>host_type</span><span class='lparen'>(</span><span class='id identifier rubyid_host'>host</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='symbol'>:ssh</span> <span class='kw'>if</span> <span class='id identifier rubyid_port_open?'>port_open?</span><span class='lparen'>(</span><span class='id identifier rubyid_host'>host</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Remotus/SshConnection.html" title="Remotus::SshConnection (class)">SshConnection</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Remotus/SshConnection.html#REMOTE_PORT-constant" title="Remotus::SshConnection::REMOTE_PORT (constant)">REMOTE_PORT</a></span></span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='symbol'>:winrm</span> <span class='kw'>if</span> <span class='id identifier rubyid_port_open?'>port_open?</span><span class='lparen'>(</span><span class='id identifier rubyid_host'>host</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Remotus/WinrmConnection.html" title="Remotus::WinrmConnection (class)">WinrmConnection</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Remotus/WinrmConnection.html#REMOTE_PORT-constant" title="Remotus::WinrmConnection::REMOTE_PORT (constant)">REMOTE_PORT</a></span></span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='rparen'>)</span>
+
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="log_formatter-class_method">
+  
+    .<strong>log_formatter</strong>  &#x21d2; <tt>::Logger::Formatter</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Gets the remotus log formatter</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>::Logger::Formatter</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>current log formatter</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_formatter'>log_formatter</span>
+  <span class='ivar'>@log_formatter</span> <span class='op'>||=</span> <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_formatter'>formatter</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="log_formatter=-class_method">
+  
+    .<strong>log_formatter=</strong>(log_formatter)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Sets the remotus log formatter</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>log_formatter</span>
+      
+      
+        <span class='type'>(<tt>::Logger::Formatter</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>new log formatter</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+118
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 118</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_log_formatter='>log_formatter=</span><span class='lparen'>(</span><span class='id identifier rubyid_log_formatter'>log_formatter</span><span class='rparen'>)</span>
+  <span class='ivar'>@log_formatter</span> <span class='op'>=</span> <span class='id identifier rubyid_log_formatter'>log_formatter</span>
+  <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_formatter'>formatter</span> <span class='op'>=</span> <span class='id identifier rubyid_log_formatter'>log_formatter</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="logger-class_method">
+  
+    .<strong>logger</strong>  &#x21d2; <tt><span class='object_link'><a href="Remotus/Logger.html" title="Remotus::Logger (class)">Remotus::Logger</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Gets the remotus logger</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Remotus/Logger.html" title="Remotus::Logger (class)">Remotus::Logger</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>current logger</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+87
+88
+89</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 87</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span>
+  <span class='ivar'>@logger</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Remotus/Logger.html" title="Remotus::Logger (class)">Logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='gvar'>$stdout</span><span class='comma'>,</span> <span class='label'>level:</span> <span class='const'><span class='object_link'><a href="Remotus/Logger.html" title="Remotus::Logger (class)">Logger</a></span></span><span class='op'>::</span><span class='const'>INFO</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="logger=-class_method">
+  
+    .<strong>logger=</strong>(logger)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Sets the remotus logger</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>logger</span>
+      
+      
+        <span class='type'>(<tt>::Logger</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>logger to set</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+96
+97
+98
+99
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 96</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_logger='>logger=</span><span class='lparen'>(</span><span class='id identifier rubyid_logger'>logger</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Remotus/Logger.html" title="Remotus::Logger (class)">Logger</a></span></span><span class='op'>::</span><span class='const'>FATAL</span>
+    <span class='kw'>return</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span>
+  <span class='kw'>end</span>
+  <span class='ivar'>@logger</span> <span class='op'>=</span> <span class='id identifier rubyid_logger'>logger</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="port_open?-class_method">
+  
+    .<strong>port_open?</strong>(host, port, timeout: 1)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Checks if a remote port is open</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>host</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote host</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>port</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote port</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>timeout</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>1</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>amount of time to wait in seconds</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>true if port is open, false otherwise</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+58
+59
+60
+61
+62
+63
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus.rb', line 58</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_port_open?'>port_open?</span><span class='lparen'>(</span><span class='id identifier rubyid_host'>host</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Checking if </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_host'>host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_port'>port</span><span class='embexpr_end'>}</span><span class='tstring_content'> is accessible</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='const'>Socket</span><span class='period'>.</span><span class='id identifier rubyid_tcp'>tcp</span><span class='lparen'>(</span><span class='id identifier rubyid_host'>host</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='comma'>,</span> <span class='label'>connect_timeout:</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span>
+  <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_host'>host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_port'>port</span><span class='embexpr_end'>}</span><span class='tstring_content'> is inaccessible</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Oct 23 18:42:53 2023 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.34 (ruby-3.0.4).
+</div>
+
+    </div>
+  </body>
+</html>

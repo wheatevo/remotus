@@ -1,0 +1,2596 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Remotus::SshConnection
+  
+    &mdash; Documentation by YARD 0.9.34
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "Remotus::SshConnection";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span>
+     &raquo; 
+    <span class="title">SshConnection</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Remotus::SshConnection
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Remotus::SshConnection</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  <dl>
+      <dt>Extended by:</dt>
+      <dd>Forwardable</dd>
+  </dl>
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/remotus/ssh_connection.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Class representing an SSH connection to a host</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="SshConnection/GatewayConnection.html" title="Remotus::SshConnection::GatewayConnection (class)">GatewayConnection</a></span>
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="REMOTE_PORT-constant" class="">REMOTE_PORT =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Standard SSH remote port</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>22</span></pre></dd>
+      
+        <dt id="KEEPALIVE_INTERVAL-constant" class="">KEEPALIVE_INTERVAL =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Standard SSH keepalive interval</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>300</span></pre></dd>
+      
+        <dt id="DEFAULT_RETRIES-constant" class="">DEFAULT_RETRIES =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Number of default retries</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>8</span></pre></dd>
+      
+        <dt id="BASE_CONNECT_OPTIONS-constant" class="">BASE_CONNECT_OPTIONS =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Base options for new SSH connections</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span> <span class='label'>non_interactive:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>keepalive:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>keepalive_interval:</span> <span class='const'><span class='object_link'><a href="#KEEPALIVE_INTERVAL-constant" title="Remotus::SshConnection::KEEPALIVE_INTERVAL (constant)">KEEPALIVE_INTERVAL</a></span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#host-instance_method" title="#host (instance method)">#<strong>host</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Host hostname.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#host_pool-instance_method" title="#host_pool (instance method)">#<strong>host_pool</strong>  &#x21d2; Remotus::HostPool </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Host_pool associated host pool.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#port-instance_method" title="#port (instance method)">#<strong>port</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Remote port.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#base_connection-instance_method" title="#base_connection (instance method)">#<strong>base_connection</strong>  &#x21d2; Net::SSH::Connection::Session </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Retrieves/creates the base SSH connection for the host If the base connection already exists, the existing connection will be retrieved.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#close-instance_method" title="#close (instance method)">#<strong>close</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Closes the current SSH connection if it is active.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connection-instance_method" title="#connection (instance method)">#<strong>connection</strong>  &#x21d2; Net::SSH::Connection::Session </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Retrieves/creates the SSH connection for the host If the connection already exists, the existing connection will be retrieved.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#download-instance_method" title="#download (instance method)">#<strong>download</strong>(remote_path, local_path = nil, options = {})  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Downloads a file from the remote host to the local host.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#file_exist%3F-instance_method" title="#file_exist? (instance method)">#<strong>file_exist?</strong>(remote_path, **options)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Checks if a remote file or directory exists.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(host, port = REMOTE_PORT, host_pool: nil)  &#x21d2; SshConnection </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Creates an SshConnection.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#port_open%3F-instance_method" title="#port_open? (instance method)">#<strong>port_open?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Whether the remote host&#39;s SSH port is available.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run-instance_method" title="#run (instance method)">#<strong>run</strong>(command, *args, **options)  &#x21d2; Remotus::Result </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Runs a command on the host.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#run_script-instance_method" title="#run_script (instance method)">#<strong>run_script</strong>(local_path, remote_path, *args, **options)  &#x21d2; Remotus::Result </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Uploads a script and runs it on the host.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#type-instance_method" title="#type (instance method)">#<strong>type</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Connection type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#upload-instance_method" title="#upload (instance method)">#<strong>upload</strong>(local_path, remote_path, options = {})  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Uploads a file from the local host to the remote host.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(host, port = REMOTE_PORT, host_pool: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Remotus::SshConnection (class)">SshConnection</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Creates an SshConnection</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>host</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>hostname</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>port</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>REMOTE_PORT</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote port</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>host_pool</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="HostPool.html" title="Remotus::HostPool (class)">Remotus::HostPool</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>associated host pool To connect to a host via IP, the following metadata entry can be provided to the host pool:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='symbol'>:ip</span>
+</code></pre>
+
+<p>To configure the gateway, the following metadata entries can be provided to the host pool:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='symbol'>:gateway_host</span>
+<span class='symbol'>:gateway_port</span>
+<span class='symbol'>:gateway_metadata</span>
+<span class='symbol'>:gateway_ip</span>
+</code></pre>
+
+<p>These function similarly to the host, port, host_pool metadata, and ip fields.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+90
+91
+92
+93
+94
+95</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 90</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_host'>host</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#REMOTE_PORT-constant" title="Remotus::SshConnection::REMOTE_PORT (constant)">REMOTE_PORT</a></span></span><span class='comma'>,</span> <span class='label'>host_pool:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Creating SshConnection </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_object_id'>object_id</span><span class='embexpr_end'>}</span><span class='tstring_content'> for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_host'>host</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='ivar'>@host</span> <span class='op'>=</span> <span class='id identifier rubyid_host'>host</span>
+  <span class='ivar'>@port</span> <span class='op'>=</span> <span class='id identifier rubyid_port'>port</span>
+  <span class='ivar'>@host_pool</span> <span class='op'>=</span> <span class='id identifier rubyid_host_pool'>host_pool</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="host-instance_method">
+  
+    #<strong>host</strong>  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns host hostname.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>host hostname</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+32
+33
+34</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 32</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_host'>host</span>
+  <span class='ivar'>@host</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="host_pool-instance_method">
+  
+    #<strong>host_pool</strong>  &#x21d2; <tt><span class='object_link'><a href="HostPool.html" title="Remotus::HostPool (class)">Remotus::HostPool</a></span></tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns host_pool associated host pool.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="HostPool.html" title="Remotus::HostPool (class)">Remotus::HostPool</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>host_pool associated host pool</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+35
+36
+37</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 35</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_host_pool'>host_pool</span>
+  <span class='ivar'>@host_pool</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="port-instance_method">
+  
+    #<strong>port</strong>  &#x21d2; <tt>Integer</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns Remote port.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Remote port</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+29
+30
+31</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 29</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_port'>port</span>
+  <span class='ivar'>@port</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="base_connection-instance_method">
+  
+    #<strong>base_connection</strong>  &#x21d2; <tt>Net::SSH::Connection::Session</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Retrieves/creates the base SSH connection for the host If the base connection already exists, the existing connection will be retrieved</p>
+
+<p>The SSH connection will be the same whether it is retrieved via base_connection or connection.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Net::SSH::Connection::Session</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>base SSH remote connection</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+114
+115
+116</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 114</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_base_connection'>base_connection</span>
+  <span class='id identifier rubyid_connection'>connection</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="close-instance_method">
+  
+    #<strong>close</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Closes the current SSH connection if it is active</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 161</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_close'>close</span>
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Closing SSH connection.</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+  <span class='kw'>begin</span>
+    <span class='ivar'>@connection</span><span class='op'>&amp;.</span><span class='id identifier rubyid_close'>close</span>
+  <span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+    <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to close existing SSH connection with error </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>begin</span>
+    <span class='ivar'>@gateway</span><span class='op'>&amp;.</span><span class='id identifier rubyid_connection'>connection</span><span class='op'>&amp;.</span><span class='id identifier rubyid_shutdown!'>shutdown!</span> <span class='kw'>if</span> <span class='id identifier rubyid_via_gateway?'>via_gateway?</span>
+  <span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+    <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Failed to close existing SSH gateway connection with error </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Setting @gateway and @connection to nil.</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+  <span class='ivar'>@gateway</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='ivar'>@connection</span> <span class='op'>=</span> <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connection-instance_method">
+  
+    #<strong>connection</strong>  &#x21d2; <tt>Net::SSH::Connection::Session</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Retrieves/creates the SSH connection for the host If the connection already exists, the existing connection will be retrieved</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Net::SSH::Connection::Session</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote connection</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 124</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connection'>connection</span>
+  <span class='kw'>return</span> <span class='ivar'>@connection</span> <span class='kw'>unless</span> <span class='id identifier rubyid_restart_connection?'>restart_connection?</span>
+
+  <span class='comment'># Close any active connections
+</span>  <span class='id identifier rubyid_close'>close</span>
+
+  <span class='id identifier rubyid_target_cred'>target_cred</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Auth.html" title="Remotus::Auth (module)">Auth</a></span></span><span class='period'>.</span><span class='id identifier rubyid_credential'><span class='object_link'><a href="Auth.html#credential-class_method" title="Remotus::Auth.credential (method)">credential</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Initializing SSH connection to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_user'>user</span><span class='embexpr_end'>}</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='ivar'>@port</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_target_options'>target_options</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#BASE_CONNECT_OPTIONS-constant" title="Remotus::SshConnection::BASE_CONNECT_OPTIONS (constant)">BASE_CONNECT_OPTIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
+  <span class='id identifier rubyid_target_options'>target_options</span><span class='lbracket'>[</span><span class='symbol'>:password</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_password'>password</span> <span class='kw'>if</span> <span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_password'>password</span>
+  <span class='id identifier rubyid_target_options'>target_options</span><span class='lbracket'>[</span><span class='symbol'>:keys</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_private_key'>private_key</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_private_key'>private_key</span>
+  <span class='id identifier rubyid_target_options'>target_options</span><span class='lbracket'>[</span><span class='symbol'>:key_data</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_private_key_data'>private_key_data</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_private_key_data'>private_key_data</span>
+  <span class='id identifier rubyid_target_options'>target_options</span><span class='lbracket'>[</span><span class='symbol'>:port</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@port</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#REMOTE_PORT-constant" title="Remotus::SshConnection::REMOTE_PORT (constant)">REMOTE_PORT</a></span></span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_via_gateway?'>via_gateway?</span>
+    <span class='ivar'>@gateway</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="SshConnection/GatewayConnection.html" title="Remotus::SshConnection::GatewayConnection (class)">GatewayConnection</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="SshConnection/GatewayConnection.html#initialize-instance_method" title="Remotus::SshConnection::GatewayConnection#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@host_pool</span><span class='lbracket'>[</span><span class='symbol'>:gateway_host</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@host_pool</span><span class='lbracket'>[</span><span class='symbol'>:gateway_port</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='ivar'>@host_pool</span><span class='lbracket'>[</span><span class='symbol'>:gateway_metadata</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_gateway_cred'>gateway_cred</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Auth.html" title="Remotus::Auth (module)">Auth</a></span></span><span class='period'>.</span><span class='id identifier rubyid_credential'><span class='object_link'><a href="Auth.html#credential-class_method" title="Remotus::Auth.credential (method)">credential</a></span></span><span class='lparen'>(</span><span class='ivar'>@gateway</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_gateway_options'>gateway_options</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#BASE_CONNECT_OPTIONS-constant" title="Remotus::SshConnection::BASE_CONNECT_OPTIONS (constant)">BASE_CONNECT_OPTIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
+    <span class='id identifier rubyid_gateway_options'>gateway_options</span><span class='lbracket'>[</span><span class='symbol'>:port</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@gateway</span><span class='period'>.</span><span class='id identifier rubyid_port'>port</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#REMOTE_PORT-constant" title="Remotus::SshConnection::REMOTE_PORT (constant)">REMOTE_PORT</a></span></span>
+    <span class='id identifier rubyid_gateway_options'>gateway_options</span><span class='lbracket'>[</span><span class='symbol'>:password</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_gateway_cred'>gateway_cred</span><span class='period'>.</span><span class='id identifier rubyid_password'>password</span> <span class='kw'>if</span> <span class='id identifier rubyid_gateway_cred'>gateway_cred</span><span class='period'>.</span><span class='id identifier rubyid_password'>password</span>
+    <span class='id identifier rubyid_gateway_options'>gateway_options</span><span class='lbracket'>[</span><span class='symbol'>:keys</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_gateway_cred'>gateway_cred</span><span class='period'>.</span><span class='id identifier rubyid_private_key'>private_key</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_gateway_cred'>gateway_cred</span><span class='period'>.</span><span class='id identifier rubyid_private_key'>private_key</span>
+    <span class='id identifier rubyid_gateway_options'>gateway_options</span><span class='lbracket'>[</span><span class='symbol'>:key_data</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_gateway_cred'>gateway_cred</span><span class='period'>.</span><span class='id identifier rubyid_private_key_data'>private_key_data</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_gateway_cred'>gateway_cred</span><span class='period'>.</span><span class='id identifier rubyid_private_key_data'>private_key_data</span>
+
+    <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Initializing SSH gateway connection to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_gateway_cred'>gateway_cred</span><span class='period'>.</span><span class='id identifier rubyid_user'>user</span><span class='embexpr_end'>}</span><span class='tstring_content'>@</span><span class='embexpr_beg'>#{</span><span class='ivar'>@gateway</span><span class='period'>.</span><span class='id identifier rubyid_host'>host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_gateway_options'>gateway_options</span><span class='lbracket'>[</span><span class='symbol'>:port</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='ivar'>@gateway</span><span class='period'>.</span><span class='id identifier rubyid_connection'>connection</span> <span class='op'>=</span> <span class='const'>Net</span><span class='op'>::</span><span class='const'>SSH</span><span class='op'>::</span><span class='const'>Gateway</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_gateway_host'>remote_gateway_host</span><span class='comma'>,</span> <span class='id identifier rubyid_gateway_cred'>gateway_cred</span><span class='period'>.</span><span class='id identifier rubyid_user'>user</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_gateway_options'>gateway_options</span><span class='rparen'>)</span>
+    <span class='ivar'>@connection</span> <span class='op'>=</span> <span class='ivar'>@gateway</span><span class='period'>.</span><span class='id identifier rubyid_connection'>connection</span><span class='period'>.</span><span class='id identifier rubyid_ssh'>ssh</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_host'>remote_host</span><span class='comma'>,</span> <span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_user'>user</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_target_options'>target_options</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='ivar'>@connection</span> <span class='op'>=</span> <span class='const'>Net</span><span class='op'>::</span><span class='const'>SSH</span><span class='period'>.</span><span class='id identifier rubyid_start'>start</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_host'>remote_host</span><span class='comma'>,</span> <span class='id identifier rubyid_target_cred'>target_cred</span><span class='period'>.</span><span class='id identifier rubyid_user'>user</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_target_options'>target_options</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="download-instance_method">
+  
+    #<strong>download</strong>(remote_path, local_path = nil, options = {})  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Downloads a file from the remote host to the local host</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>remote_path</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote path to download the file from (source)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>local_path</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>local path to download the file to (destination) if local_path is nil, the file&#39;s content will be returned</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>download options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    
+    
+    
+    
+    <p class="tag_title">Options Hash (<tt>options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:sudo</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to run the download with sudo (defaults to false)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:retries</span>
+          <span class="type">(<tt>Integer</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>number of times to retry a closed connection (defaults to 2)</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>local path or file content (if local_path is nil)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 384</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_download'>download</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='id identifier rubyid_local_path'>local_path</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='comment'># Support short calling syntax (download(&quot;remote_path&quot;, option1: 123, option2: 234))
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_local_path'>local_path</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='id identifier rubyid_local_path'>local_path</span>
+    <span class='id identifier rubyid_local_path'>local_path</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Sudo prep
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:sudo</span><span class='rbracket'>]</span>
+    <span class='comment'># Must first copy the file to an accessible directory for the login user to download it
+</span>    <span class='id identifier rubyid_user_remote_path'>user_remote_path</span> <span class='op'>=</span> <span class='id identifier rubyid_sudo_remote_file_path'>sudo_remote_file_path</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='rparen'>)</span>
+    <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sudo enabled, copying file from </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user_remote_path'>user_remote_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/bin/cp -f &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user_remote_path'>user_remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; &amp;&amp; chown </span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Auth.html" title="Remotus::Auth (module)">Auth</a></span></span><span class='period'>.</span><span class='id identifier rubyid_credential'><span class='object_link'><a href="Auth.html#credential-class_method" title="Remotus::Auth.credential (method)">credential</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_user'><span class='object_link'><a href="Auth/Credential.html#user-instance_method" title="Remotus::Auth::Credential#user (method)">user</a></span></span><span class='embexpr_end'>}</span><span class='tstring_content'> &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user_remote_path'>user_remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+        <span class='label'>sudo:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_error!'>error!</span>
+    <span class='id identifier rubyid_remote_path'>remote_path</span> <span class='op'>=</span> <span class='id identifier rubyid_user_remote_path'>user_remote_path</span>
+  <span class='kw'>end</span>
+
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Downloading file from </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>nil</span>
+
+  <span class='id identifier rubyid_with_retries'>with_retries</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Download </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_local_path'>local_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:retries</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#DEFAULT_RETRIES-constant" title="Remotus::SshConnection::DEFAULT_RETRIES (constant)">DEFAULT_RETRIES</a></span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_connection'>connection</span><span class='period'>.</span><span class='id identifier rubyid_scp'>scp</span><span class='period'>.</span><span class='id identifier rubyid_download!'>download!</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='id identifier rubyid_local_path'>local_path</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Return the file content if that is desired
+</span>  <span class='id identifier rubyid_local_path'>local_path</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>:</span> <span class='id identifier rubyid_local_path'>local_path</span>
+<span class='kw'>ensure</span>
+  <span class='comment'># Sudo cleanup
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:sudo</span><span class='rbracket'>]</span>
+    <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sudo enabled, removing temporary file from </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user_remote_path'>user_remote_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/bin/rm -f &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user_remote_path'>user_remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>sudo:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_error!'>error!</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="file_exist?-instance_method">
+  
+    #<strong>file_exist?</strong>(remote_path, **options)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Checks if a remote file or directory exists</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>remote_path</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote path to the file or directory</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>command options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    
+    
+    <p class="tag_title">Options Hash (<tt>**options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:sudo</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to run the check with sudo (defaults to false)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:pty</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to allocate a terminal (defaults to false)</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>true if the file or directory exists, false otherwise</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+429
+430
+431
+432</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 429</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_file_exist?'>file_exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Checking if file </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'> exists on </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>test -f &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39; || test -d &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_success?'>success?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="port_open?-instance_method">
+  
+    #<strong>port_open?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Whether the remote host&#39;s SSH port is available</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>true if available, false otherwise</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+187
+188
+189</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 187</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_port_open?'>port_open?</span>
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_port_open?'><span class='object_link'><a href="../Remotus.html#port_open%3F-class_method" title="Remotus.port_open? (method)">port_open?</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_remote_host'>remote_host</span><span class='comma'>,</span> <span class='ivar'>@port</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run-instance_method">
+  
+    #<strong>run</strong>(command, *args, **options)  &#x21d2; <tt><span class='object_link'><a href="Result.html" title="Remotus::Result (class)">Remotus::Result</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Runs a command on the host</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>command</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>command to run</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>args</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>command arguments</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>command options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    
+    
+    
+    
+    <p class="tag_title">Options Hash (<tt>**options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:sudo</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to run the command with sudo (defaults to false)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:pty</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to allocate a terminal (defaults to false)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:retries</span>
+          <span class="type">(<tt>Integer</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>number of times to retry a closed connection (defaults to 2)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:input</span>
+          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>stdin input to provide to the command</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:accepted_exit_codes</span>
+          <span class="type">(<tt>Array&lt;Integer&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>array of acceptable exit codes (defaults to [0]) only used if :on_error or :on_success are set</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_complete</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when the command is finished (whether successful or unsuccessful)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_error</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when the command is unsuccessful</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_output</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when any data is received</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_stderr</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when stderr data is received</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_stdout</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when stdout data is received</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_success</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when the command is successful</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Result.html" title="Remotus::Result (class)">Remotus::Result</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>result describing the stdout, stderr, and exit status of the command</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 212</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_command'>command</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:input</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='op'>+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_stdout'>stdout</span> <span class='op'>=</span> <span class='op'>+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_stderr'>stderr</span> <span class='op'>=</span> <span class='op'>+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='op'>+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_exit_code'>exit_code</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_retries'>retries</span> <span class='op'>||=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:retries</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#DEFAULT_RETRIES-constant" title="Remotus::SshConnection::DEFAULT_RETRIES (constant)">DEFAULT_RETRIES</a></span></span>
+  <span class='id identifier rubyid_accepted_exit_codes'>accepted_exit_codes</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:accepted_exit_codes</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_ssh_command'>ssh_command</span> <span class='op'>=</span> <span class='id identifier rubyid_command'>command</span>
+
+  <span class='comment'># Refer to the command by object_id throughout the log to avoid logging sensitive data
+</span>  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Preparing to run command </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='embexpr_end'>}</span><span class='tstring_content'> on </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_with_retries'>with_retries</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_retries'>retries</span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='comment'># Handle sudo
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:sudo</span><span class='rbracket'>]</span>
+      <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sudo is enabled for command </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_ssh_command'>ssh_command</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sudo -p &#39;&#39; -S sh -c &#39;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&#39;\&quot;&#39;\&quot;&#39;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>&#39;</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Auth.html" title="Remotus::Auth (module)">Auth</a></span></span><span class='period'>.</span><span class='id identifier rubyid_credential'><span class='object_link'><a href="Auth.html#credential-class_method" title="Remotus::Auth.credential (method)">credential</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_password'><span class='object_link'><a href="Auth/Credential.html#password-instance_method" title="Remotus::Auth::Credential#password (method)">password</a></span></span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_input'>input</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+
+      <span class='comment'># If password was nil, raise an exception
+</span>      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="MissingSudoPassword.html" title="Remotus::MissingSudoPassword (class)">MissingSudoPassword</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_host'>host</span><span class='embexpr_end'>}</span><span class='tstring_content'> credential does not have a password specified</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Allocate a terminal if specified
+</span>    <span class='id identifier rubyid_pty'>pty</span> <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:pty</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='kw'>false</span>
+    <span class='id identifier rubyid_skip_first_output'>skip_first_output</span> <span class='op'>=</span> <span class='id identifier rubyid_pty'>pty</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:sudo</span><span class='rbracket'>]</span>
+
+    <span class='comment'># Open an SSH channel to the host
+</span>    <span class='id identifier rubyid_channel_handle'>channel_handle</span> <span class='op'>=</span> <span class='id identifier rubyid_connection'>connection</span><span class='period'>.</span><span class='id identifier rubyid_open_channel'>open_channel</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_channel'>channel</span><span class='op'>|</span>
+      <span class='comment'># Execute the command
+</span>      <span class='kw'>if</span> <span class='id identifier rubyid_pty'>pty</span>
+        <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Requesting pty for command </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_channel'>channel</span><span class='period'>.</span><span class='id identifier rubyid_request_pty'>request_pty</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_ch'>ch</span><span class='comma'>,</span> <span class='id identifier rubyid_success'>success</span><span class='op'>|</span>
+          <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PtyError.html" title="Remotus::PtyError (class)">PtyError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>could not obtain pty</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_success'>success</span>
+
+          <span class='id identifier rubyid_ch'>ch</span><span class='period'>.</span><span class='id identifier rubyid_exec'>exec</span><span class='lparen'>(</span><span class='id identifier rubyid_ssh_command'>ssh_command</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+      <span class='kw'>else</span>
+        <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Executing command </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_channel'>channel</span><span class='period'>.</span><span class='id identifier rubyid_exec'>exec</span><span class='lparen'>(</span><span class='id identifier rubyid_ssh_command'>ssh_command</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+
+      <span class='comment'># Provide input
+</span>      <span class='kw'>unless</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+        <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sending input for command </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_channel'>channel</span><span class='period'>.</span><span class='id identifier rubyid_send_data'>send_data</span> <span class='id identifier rubyid_input'>input</span>
+        <span class='id identifier rubyid_channel'>channel</span><span class='period'>.</span><span class='id identifier rubyid_eof!'>eof!</span>
+      <span class='kw'>end</span>
+
+      <span class='comment'># Process stdout
+</span>      <span class='id identifier rubyid_channel'>channel</span><span class='period'>.</span><span class='id identifier rubyid_on_data'>on_data</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_ch'>ch</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='op'>|</span>
+        <span class='comment'># Skip the first iteration if sudo and pty is enabled to avoid outputting the sudo password
+</span>        <span class='kw'>if</span> <span class='id identifier rubyid_skip_first_output'>skip_first_output</span>
+          <span class='id identifier rubyid_skip_first_output'>skip_first_output</span> <span class='op'>=</span> <span class='kw'>false</span>
+          <span class='kw'>next</span>
+        <span class='kw'>end</span>
+        <span class='id identifier rubyid_stdout'>stdout</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_data'>data</span>
+        <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_data'>data</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_stdout</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_ch'>ch</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_stdout</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_output</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_ch'>ch</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_output</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+
+      <span class='comment'># Process stderr
+</span>      <span class='id identifier rubyid_channel'>channel</span><span class='period'>.</span><span class='id identifier rubyid_on_extended_data'>on_extended_data</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_ch'>ch</span><span class='comma'>,</span> <span class='id identifier rubyid__'>_</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='op'>|</span>
+        <span class='id identifier rubyid_stderr'>stderr</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_data'>data</span>
+        <span class='id identifier rubyid_output'>output</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_data'>data</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_stderr</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_ch'>ch</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_stderr</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_output</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_ch'>ch</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_output</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+
+      <span class='comment'># Process exit status/code
+</span>      <span class='id identifier rubyid_channel'>channel</span><span class='period'>.</span><span class='id identifier rubyid_on_request'>on_request</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>exit-status</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid__'>_</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='op'>|</span>
+        <span class='id identifier rubyid_exit_code'>exit_code</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_read_long'>read_long</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Block until the command has completed execution
+</span>    <span class='id identifier rubyid_channel_handle'>channel_handle</span><span class='period'>.</span><span class='id identifier rubyid_wait'>wait</span>
+
+    <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Generating result for command </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Result.html" title="Remotus::Result (class)">Result</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Result.html#initialize-instance_method" title="Remotus::Result#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_stdout'>stdout</span><span class='comma'>,</span> <span class='id identifier rubyid_stderr'>stderr</span><span class='comma'>,</span> <span class='id identifier rubyid_output'>output</span><span class='comma'>,</span> <span class='id identifier rubyid_exit_code'>exit_code</span><span class='rparen'>)</span>
+
+    <span class='comment'># If we are using sudo and experience an authentication failure, raise an exception
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:sudo</span><span class='rbracket'>]</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_error?'>error?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_stderr'>stderr</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_stderr'>stderr</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^sudo: \d+ incorrect password attempts?$</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="AuthenticationError.html" title="Remotus::AuthenticationError (class)">AuthenticationError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not authenticate to sudo as </span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Auth.html" title="Remotus::Auth (module)">Auth</a></span></span><span class='period'>.</span><span class='id identifier rubyid_credential'><span class='object_link'><a href="Auth.html#credential-class_method" title="Remotus::Auth.credential (method)">credential</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_user'><span class='object_link'><a href="Auth/Credential.html#user-instance_method" title="Remotus::Auth::Credential#user (method)">user</a></span></span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Perform success, error, and completion callbacks
+</span>    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_success</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_success</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_success?'>success?</span><span class='lparen'>(</span><span class='id identifier rubyid_accepted_exit_codes'>accepted_exit_codes</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_error</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_error</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_error?'>error?</span><span class='lparen'>(</span><span class='id identifier rubyid_accepted_exit_codes'>accepted_exit_codes</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_complete</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:on_complete</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:call</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_result'>result</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="run_script-instance_method">
+  
+    #<strong>run_script</strong>(local_path, remote_path, *args, **options)  &#x21d2; <tt><span class='object_link'><a href="Result.html" title="Remotus::Result (class)">Remotus::Result</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Uploads a script and runs it on the host</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>local_path</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>local path of the script (source)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remote_path</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote path for the script (destination)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>args</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>script arguments</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>command options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    <p class="tag_title">Options Hash (<tt>**options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:sudo</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to run the script with sudo (defaults to false)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:pty</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to allocate a terminal (defaults to false)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:retries</span>
+          <span class="type">(<tt>Integer</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>number of times to retry a closed connection (defaults to 2)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:input</span>
+          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>stdin input to provide to the command</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:accepted_exit_codes</span>
+          <span class="type">(<tt>Array&lt;Integer&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>array of acceptable exit codes (defaults to [0]) only used if :on_error or :on_success are set</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_complete</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when the command is finished (whether successful or unsuccessful)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_error</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when the command is unsuccessful</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_output</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when any data is received</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_stderr</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when stderr data is received</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_stdout</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when stdout data is received</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:on_success</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>callback invoked when the command is successful</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Result.html" title="Remotus::Result (class)">Remotus::Result</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>result describing the stdout, stderr, and exit status of the command</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+333
+334
+335
+336
+337
+338</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 333</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_run_script'>run_script</span><span class='lparen'>(</span><span class='id identifier rubyid_local_path'>local_path</span><span class='comma'>,</span> <span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_upload'>upload</span><span class='lparen'>(</span><span class='id identifier rubyid_local_path'>local_path</span><span class='comma'>,</span> <span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Running script </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_content'> on </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>chmod +x </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="type-instance_method">
+  
+    #<strong>type</strong>  &#x21d2; <tt>Symbol</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Connection type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>returns :ssh</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+102
+103
+104</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 102</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_type'>type</span>
+  <span class='symbol'>:ssh</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="upload-instance_method">
+  
+    #<strong>upload</strong>(local_path, remote_path, options = {})  &#x21d2; <tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Uploads a file from the local host to the remote host</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>local_path</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>local path to upload the file from (source)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remote_path</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote path to upload the file to (destination)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>upload options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    
+    
+    
+    
+    <p class="tag_title">Options Hash (<tt>options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:sudo</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to run the upload with sudo (defaults to false)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:owner</span>
+          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>file owner (“oracle”)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:group</span>
+          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>file group (“dba”)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:mode</span>
+          <span class="type">(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>file mode (“0640”)</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:retries</span>
+          <span class="type">(<tt>Integer</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>number of times to retry a closed connection (defaults to 2)</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>remote path</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/remotus/ssh_connection.rb', line 354</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_upload'>upload</span><span class='lparen'>(</span><span class='id identifier rubyid_local_path'>local_path</span><span class='comma'>,</span> <span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Remotus.html" title="Remotus (module)">Remotus</a></span></span><span class='period'>.</span><span class='id identifier rubyid_logger'><span class='object_link'><a href="../Remotus.html#logger-class_method" title="Remotus.logger (method)">logger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Uploading file </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_local_path'>local_path</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:sudo</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_sudo_upload'>sudo_upload</span><span class='lparen'>(</span><span class='id identifier rubyid_local_path'>local_path</span><span class='comma'>,</span> <span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_permission_cmd'>permission_cmd</span> <span class='op'>=</span> <span class='id identifier rubyid_permission_cmds'>permission_cmds</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:owner</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:group</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:mode</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_with_retries'>with_retries</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Upload </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_local_path'>local_path</span><span class='embexpr_end'>}</span><span class='tstring_content'> to </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remote_path'>remote_path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:retries</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#DEFAULT_RETRIES-constant" title="Remotus::SshConnection::DEFAULT_RETRIES (constant)">DEFAULT_RETRIES</a></span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_connection'>connection</span><span class='period'>.</span><span class='id identifier rubyid_scp'>scp</span><span class='period'>.</span><span class='id identifier rubyid_upload!'>upload!</span><span class='lparen'>(</span><span class='id identifier rubyid_local_path'>local_path</span><span class='comma'>,</span> <span class='id identifier rubyid_remote_path'>remote_path</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_permission_cmd'>permission_cmd</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_error!'>error!</span> <span class='kw'>unless</span> <span class='id identifier rubyid_permission_cmd'>permission_cmd</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_remote_path'>remote_path</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Oct 23 18:42:54 2023 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.34 (ruby-3.0.4).
+</div>
+
+    </div>
+  </body>
+</html>
