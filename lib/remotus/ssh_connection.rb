@@ -74,13 +74,18 @@ module Remotus
     # @param [String] host hostname
     # @param [Integer] port remote port
     # @param [Remotus::HostPool] host_pool associated host pool
+    #                                      To connect to a host via IP, the following metadata
+    #                                      entry can be provided to the host pool:
+    #                                        :ip
+    #
     #                                      To configure the gateway, the following metadata
     #                                      entries can be provided to the host pool:
     #                                        :gateway_host
     #                                        :gateway_port
     #                                        :gateway_metadata
+    #                                        :gateway_ip
     #
-    #                                      These function similarly to the host, port, and host_pool metadata fields.
+    #                                      These function similarly to the host, port, host_pool metadata, and ip fields.
     #
     def initialize(host, port = REMOTE_PORT, host_pool: nil)
       Remotus.logger.debug { "Creating SshConnection #{object_id} for #{host}" }
@@ -143,10 +148,10 @@ module Remotus
 
         Remotus.logger.debug { "Initializing SSH gateway connection to #{gateway_cred.user}@#{@gateway.host}:#{gateway_options[:port]}" }
 
-        @gateway.connection = Net::SSH::Gateway.new(@gateway.host, gateway_cred.user, **gateway_options)
-        @connection = @gateway.connection.ssh(@host, target_cred.user, **target_options)
+        @gateway.connection = Net::SSH::Gateway.new(remote_gateway_host, gateway_cred.user, **gateway_options)
+        @connection = @gateway.connection.ssh(remote_host, target_cred.user, **target_options)
       else
-        @connection = Net::SSH.start(@host, target_cred.user, **target_options)
+        @connection = Net::SSH.start(remote_host, target_cred.user, **target_options)
       end
     end
 
@@ -180,7 +185,7 @@ module Remotus
     # @return [Boolean] true if available, false otherwise
     #
     def port_open?
-      Remotus.port_open?(@host, @port)
+      Remotus.port_open?(remote_host, @port)
     end
 
     #
@@ -477,7 +482,7 @@ module Remotus
     def restart_connection?
       return true unless @connection
       return true if @connection.closed?
-      return true if @host != @connection.host
+      return true if remote_host != @connection.host
 
       target_cred = Remotus::Auth.credential(self)
 
@@ -493,7 +498,7 @@ module Remotus
         gateway_session = @gateway.connection.instance_variable_get(:@session)
 
         return true if gateway_session.closed?
-        return true if @host_pool[:gateway_host] != gateway_session.host
+        return true if remote_gateway_host != gateway_session.host
 
         gateway_cred = Remotus::Auth.credential(@gateway)
 
@@ -583,6 +588,44 @@ module Remotus
     #
     def via_gateway?
       host_pool && host_pool[:gateway_host]
+    end
+
+    #
+    # Whether connecting via IP instead of hostname
+    #
+    # @return [Boolean] true if using an IP, false otherwise
+    #
+    def via_ip?
+      host_pool && !host_pool[:ip].to_s.empty?
+    end
+
+    #
+    # Remote host used for the connection. Will use the ip if specified, otherwise uses the hostname.
+    #
+    # @return [String] Remote host
+    #
+    def remote_host
+      via_ip? ? host_pool[:ip] : @host
+    end
+
+    #
+    # Whether connecting via gateway IP instead of gateway hostname
+    #
+    # @return [Boolean] true if using an IP, false otherwise
+    #
+    def via_gateway_ip?
+      host_pool && !host_pool[:gateway_ip].to_s.empty?
+    end
+
+    #
+    # Remote gateway host used for the connection. Will use the gateway_ip if specified, otherwise uses the hostname.
+    #
+    # @return [String] Remote gateway host
+    #
+    def remote_gateway_host
+      return nil unless via_gateway?
+
+      via_gateway_ip? ? host_pool[:gateway_ip] : host_pool[:gateway_host]
     end
   end
 end

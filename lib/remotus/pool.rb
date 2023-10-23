@@ -20,6 +20,9 @@ module Remotus
       # @option options [Integer] :timeout amount of time to wait for a connection from the pool
       # @option options [Integer] :port port to use for the connection
       # @option options [Symbol]  :proto protocol to use for the connection (:winrm, :ssh), must be specified if port is specified
+      # @option options [String]  :ip IP to use for the connection, preferred over the hostname if set.
+      #                               This should be used if the hostname is required for credential retrieval
+      #                               but the hostname cannot be resolved by DNS.
       #
       # @return [Remotus::HostPool] Host pool for the given host
       #

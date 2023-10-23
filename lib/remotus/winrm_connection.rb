@@ -69,7 +69,7 @@ module Remotus
 
       Remotus.logger.debug { "Initializing WinRM connection to #{Remotus::Auth.credential(self).user}@#{@host}:#{@port}" }
       @base_connection = WinRM::Connection.new(
-        endpoint: "http://#{@host}:#{@port}/wsman",
+        endpoint: "http://#{remote_host}:#{@port}/wsman",
         transport: :negotiate,
         user: Remotus::Auth.credential(self).user,
         password: Remotus::Auth.credential(self).password
@@ -106,7 +106,7 @@ module Remotus
     # @return [Boolean] true if available, false otherwise
     #
     def port_open?
-      Remotus.port_open?(@host, @port)
+      Remotus.port_open?(remote_host, @port)
     end
 
     #
@@ -195,7 +195,7 @@ module Remotus
     def restart_base_connection?
       return restart_connection?(shell: @shell) if @connection
       return true unless @base_connection
-      return true if @host != @base_connection.instance_values["connection_opts"][:endpoint].scan(%r{//(.*):}).flatten.first
+      return true if remote_host != @base_connection.instance_values["connection_opts"][:endpoint].scan(%r{//(.*):}).flatten.first
       return true if Remotus::Auth.credential(self).user != @base_connection.instance_values["connection_opts"][:user]
       return true if Remotus::Auth.credential(self).password != @base_connection.instance_values["connection_opts"][:password]
 
@@ -213,11 +213,29 @@ module Remotus
     def restart_connection?(**options)
       return true unless @connection
       return true if shell && !options[:shell].casecmp?(@shell)
-      return true if @host != @connection.connection_opts[:endpoint].scan(%r{//(.*):}).flatten.first
+      return true if remote_host != @connection.connection_opts[:endpoint].scan(%r{//(.*):}).flatten.first
       return true if Remotus::Auth.credential(self).user != @connection.connection_opts[:user]
       return true if Remotus::Auth.credential(self).password != @connection.connection_opts[:password]
 
       false
+    end
+
+    #
+    # Whether connecting via IP instead of hostname
+    #
+    # @return [Boolean] true if using an IP, false otherwise
+    #
+    def via_ip?
+      host_pool && !host_pool[:ip].to_s.empty?
+    end
+
+    #
+    # Remote host used for the connection. Will use the ip if specified, otherwise uses the hostname.
+    #
+    # @return [String] Remote host
+    #
+    def remote_host
+      via_ip? ? host_pool[:ip] : @host
     end
   end
 end

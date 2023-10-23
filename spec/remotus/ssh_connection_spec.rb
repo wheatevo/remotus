@@ -2,12 +2,13 @@
 
 RSpec.describe Remotus::SshConnection do
   let(:host) { "test.local" }
+  let(:ip) { nil }
   let(:user) { "user" }
   let(:password) { "pass" }
   let(:port) { 22 }
-  let(:host_pool) { nil }
 
   let(:gateway_host) { nil }
+  let(:gateway_ip) { nil }
   let(:gateway_port) { 22 }
   let(:gateway_metadata) { {} }
   let(:gateway_user) { "gateway" }
@@ -16,13 +17,24 @@ RSpec.describe Remotus::SshConnection do
   let(:cred) { Remotus::Auth::Credential.new(user, password) }
   let(:gateway_cred) { Remotus::Auth::Credential.new(gateway_user, gateway_password) }
 
+  let(:host_pool) { double(Remotus::HostPool) }
+  let(:host_pool_metadata) do
+    {
+      ip: ip,
+      gateway_ip: gateway_ip,
+      gateway_host: gateway_host,
+      gateway_port: gateway_port,
+      gateway_metadata: gateway_metadata
+    }
+  end
+
   let(:ssh_connection) do
     double(
       Net::SSH::Connection::Session,
       open_channel: double(Net::SSH::Connection::Channel, wait: nil),
       scp: double(Net::SCP, upload!: nil),
       closed?: false,
-      host: host,
+      host: ip || host,
       options: {
         user: user,
         password: password
@@ -45,7 +57,7 @@ RSpec.describe Remotus::SshConnection do
       open_channel: double(Net::SSH::Connection::Channel, wait: nil),
       scp: double(Net::SCP, upload!: nil),
       closed?: false,
-      host: gateway_host,
+      host: gateway_ip || gateway_host,
       options: {
         user: gateway_user,
         password: gateway_password
@@ -61,6 +73,7 @@ RSpec.describe Remotus::SshConnection do
     Remotus::Auth.cache[gateway_host] = gateway_cred if gateway_host
 
     allow(gateway_connection).to receive(:instance_variable_get).with(:@session).and_return(gateway_session)
+    allow(host_pool).to receive(:[]) { |k| host_pool_metadata[k] }
   end
 
   describe "#initialize" do
@@ -108,13 +121,23 @@ RSpec.describe Remotus::SshConnection do
       expect(connection).to be(subject.base_connection)
     end
 
+    context "when ip parameters are specified" do
+      let(:ip) { "169.254.1.1" }
+
+      it "creates the connection with IPs" do
+        expect(Net::SSH).to receive(:start).with(
+          ip, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
+        ).and_return(ssh_connection)
+
+        connection = subject.base_connection
+        expect(connection).to be(subject.base_connection)
+      end
+    end
+
     context "when gateway parameters are specified" do
       let(:gateway_host) { "gateway.local" }
       let(:gateway_port) { 2222 }
-
-      let(:host_pool) do
-        { gateway_host: gateway_host, gateway_port: gateway_port, gateway_metadata: { test: "value" } }
-      end
+      let(:gateway_metadata) { { test: "value" } }
 
       it "creates the gateway connection" do
         expect(Net::SSH::Gateway).to receive(:new).with(
@@ -126,6 +149,23 @@ RSpec.describe Remotus::SshConnection do
 
         new_connection = subject.base_connection
         expect(new_connection).to be(subject.base_connection)
+      end
+
+      context "when ip parameters are specified" do
+        let(:ip) { "169.254.1.1" }
+        let(:gateway_ip) { "169.254.2.2" }
+
+        it "creates the gateway connection with IPs" do
+          expect(Net::SSH::Gateway).to receive(:new).with(
+            gateway_ip, gateway_user, password: gateway_password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: gateway_port
+          ).and_return(gateway_connection)
+          expect(gateway_connection).to receive(:ssh).with(
+            ip, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
+          ).and_return(ssh_connection)
+
+          new_connection = subject.base_connection
+          expect(new_connection).to be(subject.base_connection)
+        end
       end
     end
   end
@@ -140,13 +180,23 @@ RSpec.describe Remotus::SshConnection do
       expect(connection).to be(subject.connection)
     end
 
+    context "when ip parameters are specified" do
+      let(:ip) { "169.254.1.1" }
+
+      it "creates the connection with IPs" do
+        expect(Net::SSH).to receive(:start).with(
+          ip, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
+        ).and_return(ssh_connection)
+
+        connection = subject.connection
+        expect(connection).to be(subject.connection)
+      end
+    end
+
     context "when gateway parameters are specified" do
       let(:gateway_host) { "gateway.local" }
       let(:gateway_port) { 2222 }
-
-      let(:host_pool) do
-        { gateway_host: gateway_host, gateway_port: gateway_port, gateway_metadata: { test: "value" } }
-      end
+      let(:gateway_metadata) { { test: "value" } }
 
       it "creates the gateway connection" do
         expect(Net::SSH::Gateway).to receive(:new).with(
@@ -159,6 +209,23 @@ RSpec.describe Remotus::SshConnection do
         new_connection = subject.connection
         expect(new_connection).to be(subject.connection)
       end
+
+      context "when ip parameters are specified" do
+        let(:ip) { "169.254.1.1" }
+        let(:gateway_ip) { "169.254.2.2" }
+
+        it "creates the gateway connection with IPs" do
+          expect(Net::SSH::Gateway).to receive(:new).with(
+            gateway_ip, gateway_user, password: gateway_password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: gateway_port
+          ).and_return(gateway_connection)
+          expect(gateway_connection).to receive(:ssh).with(
+            ip, user, password: password, non_interactive: true, keepalive: true, keepalive_interval: 300, port: port
+          ).and_return(ssh_connection)
+
+          new_connection = subject.connection
+          expect(new_connection).to be(subject.connection)
+        end
+      end
     end
   end
 
@@ -166,10 +233,7 @@ RSpec.describe Remotus::SshConnection do
     context "when using a gateway" do
       let(:gateway_host) { "gateway.local" }
       let(:gateway_port) { 2222 }
-
-      let(:host_pool) do
-        { gateway_host: gateway_host, gateway_port: gateway_port, gateway_metadata: { test: "value" } }
-      end
+      let(:gateway_metadata) { { test: "value" } }
 
       it "closes the active SSH and gateway connections" do
         expect(Net::SSH::Gateway).to receive(:new).with(
@@ -208,6 +272,15 @@ RSpec.describe Remotus::SshConnection do
     it "calls Remotus.port_open?" do
       expect(Remotus).to receive(:port_open?).with(host, port).and_return(true)
       expect(subject.port_open?).to eq(true)
+    end
+
+    context "when ip parameter is specified" do
+      let(:ip) { "169.254.3.3" }
+
+      it "calls Remotus.port_open? against the IP" do
+        expect(Remotus).to receive(:port_open?).with(ip, port).and_return(true)
+        expect(subject.port_open?).to eq(true)
+      end
     end
   end
 

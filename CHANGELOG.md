@@ -1,3 +1,6 @@
+## [1.2.0] - 2023-10-23
+* Add `:ip` option to connection methods to accommodate credential stores that require the hostname where DNS is not available.
+
 ## [1.1.1] - 2023-05-26
 * Handle close failures and improve logging around connection status.
 
