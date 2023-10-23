@@ -2,7 +2,16 @@
 
 RSpec.describe Remotus::WinrmConnection do
   let(:host) { "test.local" }
+  let(:ip) { nil }
   let(:cred) { Remotus::Auth::Credential.new("domain\\user", "pass") }
+
+  let(:host_pool) { double(Remotus::HostPool) }
+  let(:host_pool_metadata) do
+    {
+      ip: ip
+    }
+  end
+
   let(:winrm_connection) do
     double(WinRM::Connection, shell: double(WinRM::Shells::Powershell))
   end
@@ -19,10 +28,11 @@ RSpec.describe Remotus::WinrmConnection do
     double(WinRM::Output, stdout: "", stderr: "", output: "", exitcode: 0)
   end
 
-  subject { described_class.new(host) }
+  subject { described_class.new(host, host_pool: host_pool) }
 
   before do
     Remotus::Auth.cache[host] = cred
+    allow(host_pool).to receive(:[]) { |k| host_pool_metadata[k] }
   end
 
   describe "#initialize" do
@@ -72,6 +82,20 @@ RSpec.describe Remotus::WinrmConnection do
       ).and_return(winrm_elevated_connection)
       subject.base_connection
     end
+
+    context "when ip parameter is set" do
+      let(:ip) { "169.254.1.1" }
+
+      it "creates the base connection with the IP" do
+        expect(WinRM::Connection).to receive(:new).with(
+          endpoint: "http://#{ip}:5985/wsman",
+          transport: :negotiate,
+          user: cred.user,
+          password: cred.password
+        ).and_return(winrm_connection)
+        subject.base_connection
+      end
+    end
   end
 
   describe "#connection" do
@@ -94,6 +118,20 @@ RSpec.describe Remotus::WinrmConnection do
       ).and_return(winrm_elevated_connection)
       subject.connection
     end
+
+    context "when ip parameter is set" do
+      let(:ip) { "169.254.1.1" }
+
+      it "creates the connection with the IP" do
+        expect(WinRM::Connection).to receive(:new).with(
+          endpoint: "http://#{ip}:5985/wsman",
+          transport: :negotiate,
+          user: cred.user,
+          password: cred.password
+        ).and_return(winrm_connection)
+        subject.connection
+      end
+    end
   end
 
   describe "#close" do
@@ -111,6 +149,15 @@ RSpec.describe Remotus::WinrmConnection do
     it "calls Remotus.port_open?" do
       expect(Remotus).to receive(:port_open?).with(host, 5985).and_return(true)
       expect(subject.port_open?).to eq(true)
+    end
+
+    context "when ip parameter is specified" do
+      let(:ip) { "169.254.3.3" }
+
+      it "calls Remotus.port_open? against the IP" do
+        expect(Remotus).to receive(:port_open?).with(ip, 5985).and_return(true)
+        expect(subject.port_open?).to eq(true)
+      end
     end
   end
 
